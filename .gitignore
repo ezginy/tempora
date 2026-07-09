@@ -1,0 +1,19 @@
+# Node / React (frontend)
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env
+
+# Java (backend)
+backend/*.class
+backend/target/
+backend/bin/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
