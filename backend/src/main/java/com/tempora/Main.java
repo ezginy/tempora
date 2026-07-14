@@ -18,12 +18,11 @@ public class Main {
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 
-        // define what happens when a request hits "/tasks"
+        // GET all tasks and POST a new task
         server.createContext("/tasks", exchange -> {
             String method = exchange.getRequestMethod();
 
             if (method.equals("GET")) {
-                // return all tasks as JSON
                 String response = gson.toJson(taskManager.getAllTasks());
 
                 // send status code 200 (OK) along with the response length
@@ -38,7 +37,6 @@ public class Main {
                 InputStream is = exchange.getRequestBody();
                 String requestBody = new String(is.readAllBytes());
 
-                // convert the JSON into a Task object
                 Task newTask = gson.fromJson(requestBody, Task.class);
 
                 // validate: title mustn't be missing or empty
@@ -52,9 +50,8 @@ public class Main {
                     return;  // stop here, don't continue to add the task
                 }
 
-                // assign an id ourselves (client doesn't send one)
+                // assign an id ourselves (client doesn't send one) and add it to the manager
                 newTask.setId(taskManager.getAllTasks().size() + 1);
-                // add it to the manager
                 taskManager.addTask(newTask);
 
                 // respond with the created task as confirmation
@@ -65,7 +62,47 @@ public class Main {
                 os.close();
 
             } else {
-                // any other method isn't supported on this endpoint
+                exchange.sendResponseHeaders(405, -1);
+                exchange.close();
+            }
+        });
+
+
+        // GET a single task by id (path: /tasks/{id})
+        server.createContext("/tasks/", exchange -> {
+           String method = exchange.getRequestMethod();
+
+           // get the path, e.g. "/tasks/2", and split it to find the id
+            String path = exchange.getRequestURI().getPath();
+            String[] parts = path.split("/");
+            int id = Integer.parseInt(parts[2]);
+
+            if (method.equals("GET")) {
+                Task foundTask = null;
+
+                for (Task task : taskManager.getAllTasks()) {
+                    if (task.getId() == id) {
+                        foundTask = task;
+                        break;
+                    }
+                }
+
+                if (foundTask == null) {
+                    String errorResponse = "{\"error\":\"Task not found\"}";
+                    exchange.sendResponseHeaders(404, errorResponse.getBytes().length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(errorResponse.getBytes());
+                    os.close();
+                    return;
+                }
+
+                String response = gson.toJson(foundTask);
+                exchange.sendResponseHeaders(200, response.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+
+            } else {
                 exchange.sendResponseHeaders(405, -1);
                 exchange.close();
             }
