@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
@@ -19,15 +20,55 @@ public class Main {
 
         // define what happens when a request hits "/tasks"
         server.createContext("/tasks", exchange -> {
+            String method = exchange.getRequestMethod();
 
-            String response = gson.toJson(taskManager.getAllTasks());
+            if (method.equals("GET")) {
+                // return all tasks as JSON
+                String response = gson.toJson(taskManager.getAllTasks());
 
-            // send status code 200 (OK) along with the response length
-            exchange.sendResponseHeaders(200, response.getBytes().length);
+                // send status code 200 (OK) along with the response length
+                exchange.sendResponseHeaders(200, response.getBytes().length);
 
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+
+            } else if (method.equals("POST")) {
+                // read the request body (the JSON the client sent)
+                InputStream is = exchange.getRequestBody();
+                String requestBody = new String(is.readAllBytes());
+
+                // convert the JSON into a Task object
+                Task newTask = gson.fromJson(requestBody, Task.class);
+
+                // validate: title mustn't be missing or empty
+                if (newTask.getTitle() == null || newTask.getTitle().isBlank()) {
+                    String errorResponse = "{\"error\":\"Title is required\"}";
+                    exchange.sendResponseHeaders(400, errorResponse.getBytes().length);
+
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(errorResponse.getBytes());
+                    os.close();
+                    return;  // stop here, don't continue to add the task
+                }
+
+                // assign an id ourselves (client doesn't send one)
+                newTask.setId(taskManager.getAllTasks().size() + 1);
+                // add it to the manager
+                taskManager.addTask(newTask);
+
+                // respond with the created task as confirmation
+                String response = gson.toJson(newTask);
+                exchange.sendResponseHeaders(201, response.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+
+            } else {
+                // any other method isn't supported on this endpoint
+                exchange.sendResponseHeaders(405, -1);
+                exchange.close();
+            }
         });
 
         server.start();
