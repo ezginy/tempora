@@ -4,26 +4,29 @@ type TaskCardProps = {
   task: Task;
 };
 
-const priorityColors = (p: Priority): string => {
-  if (p === "HIGH") return "bg-priority-high";
-  else if (p === "MEDIUM") return "bg-priority-medium";
-  else return "bg-priority-low";
+const priorityStyles = (p: Priority): string => {
+  if (p === "HIGH")
+    return "border border-priority-high text-priority-high shadow-[0_0_8px_var(--color-priority-high)]";
+  else if (p === "MEDIUM")
+    return "border border-priority-medium text-priority-medium shadow-[0_0_8px_var(--color-priority-medium)]";
+  else
+    return "border border-priority-low text-priority-low shadow-[0_0_8px_var(--color-priority-low)]";
 };
 
 function TaskCard(props: TaskCardProps) {
   return (
-    <div className="p-4 m-4 rounded-lg shadow-md bg-stone-700 flex flex-col items-center">
-      <h3 className="p-1.5 mb-2 w-full bg-stone-400 rounded-lg text-center">
+    <div className="p-4 m-4 rounded-lg shadow-md bg-surface-card flex flex-col items-center">
+      <h3 className="p-1.5 mb-2 w-full bg-surface-card-title rounded-lg text-center text-text-primary">
         {props.task.title}
       </h3>
-      <p className="p-2 mb-4 w-full bg-stone-500 rounded-md text-center">
+      <p className="p-2 mb-4 w-full bg-surface-card-desc rounded-md text-center text-text-primary/80">
         {props.task.description}
       </p>
 
-      <div className="w-full flex justify-between">
-        <span className="p-1 rounded-full bg-stone-600">#{props.task.id}</span>
+      <div className="w-full flex justify-between text-xs">
+        <span className="p-1 text-text-muted/60">#{props.task.id}</span>
         <span
-          className={`p-1.5 rounded-full ${priorityColors(props.task.priority)}`}
+          className={`p-1.5 uppercase text-[10px] font-semibold tracking-widest rounded-full bg-surface-card-badge ${priorityStyles(props.task.priority)}`}
         >
           {props.task.priority}
         </span>

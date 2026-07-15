@@ -42,7 +42,7 @@ function Board() {
   ];
 
   return (
-    <div className="p-4 flex flex-row gap-8">
+    <div className="p-4 flex flex-row gap-8 bg-surface-page min-h-screen">
       <Column title="To Do" tasks={todoTasks}></Column>
       <Column title="In Progress" tasks={inProgressTasks}></Column>
       <Column title="Done" tasks={doneTasks}></Column>
