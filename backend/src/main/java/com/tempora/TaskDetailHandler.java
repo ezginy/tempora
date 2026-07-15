@@ -38,38 +38,43 @@ public class TaskDetailHandler implements HttpHandler {
             return;
         }
 
-        if (method.equals("GET")) {
-            String response = gson.toJson(foundTask);
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
+        switch (method) {
+            case "GET" -> {
+                String response = gson.toJson(foundTask);
+                exchange.sendResponseHeaders(200, response.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
 
-        } else if (method.equals("PUT")) {
-            InputStream is = exchange.getRequestBody();
-            String requestBody = new String(is.readAllBytes());
+            }
+            case "PUT" -> {
+                InputStream is = exchange.getRequestBody();
+                String requestBody = new String(is.readAllBytes());
 
-            Task newTask = gson.fromJson(requestBody, Task.class);
+                Task newTask = gson.fromJson(requestBody, Task.class);
 
-            foundTask.setTitle(newTask.getTitle());
-            foundTask.setDescription(newTask.getDescription());
-            foundTask.setPriority(newTask.getPriority());
+                foundTask.setTitle(newTask.getTitle());
+                foundTask.setDescription(newTask.getDescription());
+                foundTask.setPriority(newTask.getPriority());
+                foundTask.setStatus(newTask.getStatus());
 
-            String response = gson.toJson(foundTask);
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
+                String response = gson.toJson(foundTask);
+                exchange.sendResponseHeaders(200, response.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
 
-        } else if (method.equals("DELETE")) {
-            taskManager.deleteTask(foundTask);
+            }
+            case "DELETE" -> {
+                taskManager.deleteTask(foundTask);
 
-            exchange.sendResponseHeaders(204, -1);
-            exchange.close();
-
-        } else {
-            exchange.sendResponseHeaders(405, -1);
-            exchange.close();
+                exchange.sendResponseHeaders(204, -1);
+                exchange.close();
+            }
+            default -> {
+                exchange.sendResponseHeaders(405, -1);
+                exchange.close();
+            }
         }
     }
 }

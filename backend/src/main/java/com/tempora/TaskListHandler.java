@@ -21,48 +21,57 @@ public class TaskListHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
 
-        if (method.equals("GET")) {
-            String response = gson.toJson(taskManager.getAllTasks());
+        switch (method) {
+            case "GET" -> {
+                String response = gson.toJson(taskManager.getAllTasks());
 
-            // send status code 200 (OK) along with the response length
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-
-        } else if (method.equals("POST")) {
-            // read the request body (the JSON the client sent)
-            InputStream is = exchange.getRequestBody();
-            String requestBody = new String(is.readAllBytes());
-
-            Task newTask = gson.fromJson(requestBody, Task.class);
-
-            // validate: title mustn't be missing or empty
-            if (!newTask.isValid()) {
-                String errorResponse = "{\"error\":\"Title is required\"}";
-                exchange.sendResponseHeaders(400, errorResponse.getBytes().length);
+                // send status code 200 (OK) along with the response length
+                exchange.sendResponseHeaders(200, response.getBytes().length);
 
                 OutputStream os = exchange.getResponseBody();
-                os.write(errorResponse.getBytes());
+                os.write(response.getBytes());
                 os.close();
-                return;  // stop here, don't continue to add the task
+
             }
+            case "POST" -> {
+                // read the request body (the JSON the client sent)
+                InputStream is = exchange.getRequestBody();
+                String requestBody = new String(is.readAllBytes());
 
-            // assign an id ourselves (client doesn't send one) and add it to the manager
-            newTask.setId(taskManager.getAllTasks().size() + 1);
-            taskManager.addTask(newTask);
+                Task newTask = gson.fromJson(requestBody, Task.class);
 
-            // respond with the created task as confirmation
-            String response = gson.toJson(newTask);
-            exchange.sendResponseHeaders(201, response.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
+                // validate: title mustn't be missing or empty
+                if (!newTask.isValid()) {
+                    String errorResponse = "{\"error\":\"Title is required\"}";
+                    exchange.sendResponseHeaders(400, errorResponse.getBytes().length);
 
-        } else {
-            exchange.sendResponseHeaders(405, -1);
-            exchange.close();
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(errorResponse.getBytes());
+                    os.close();
+                    return;  // stop here, don't continue to add the task
+                }
+
+                // default new tasks to "to do" if the client didn't provide a status
+                if (newTask.getStatus() == null) {
+                    newTask.setStatus(Status.TODO);
+                }
+
+                // assign an id ourselves (client doesn't send one) and add it to the manager
+                newTask.setId(taskManager.getAllTasks().size() + 1);
+                taskManager.addTask(newTask);
+
+                // respond with the created task as confirmation
+                String response = gson.toJson(newTask);
+                exchange.sendResponseHeaders(201, response.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+
+            }
+            default -> {
+                exchange.sendResponseHeaders(405, -1);
+                exchange.close();
+            }
         }
     }
 }
