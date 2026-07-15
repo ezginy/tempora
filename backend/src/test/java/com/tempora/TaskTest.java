@@ -16,4 +16,16 @@ public class TaskTest {
         assertEquals("Testing testing testing", task.getDescription());
         assertEquals(Priority.MEDIUM, task.getPriority());
     }
+
+    @Test
+    public void testTaskWithBlankTitleIsInvalid() {
+        Task task = new Task(1, " ", "Desc", Priority.LOW);
+        assertFalse(task.isValid());
+    }
+
+    @Test
+    public void testTaskWithValidTitleIsValid() {
+        Task task = new Task(1, "Real title", "Desc", Priority.LOW);
+        assertTrue(task.isValid());
+    }
 }

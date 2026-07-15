@@ -39,7 +39,7 @@ public class TaskListHandler implements HttpHandler {
             Task newTask = gson.fromJson(requestBody, Task.class);
 
             // validate: title mustn't be missing or empty
-            if (newTask.getTitle() == null || newTask.getTitle().isBlank()) {
+            if (!newTask.isValid()) {
                 String errorResponse = "{\"error\":\"Title is required\"}";
                 exchange.sendResponseHeaders(400, errorResponse.getBytes().length);
 

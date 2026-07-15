@@ -27,13 +27,7 @@ public class TaskDetailHandler implements HttpHandler {
         int id = Integer.parseInt(parts[2]);
 
         // find the task with the matching id (shared by GET and PUT)
-        Task foundTask = null;
-        for (Task task : taskManager.getAllTasks()) {
-            if (task.getId() == id) {
-                foundTask = task;
-                break;
-            }
-        }
+        Task foundTask = taskManager.findById(id);
 
         if (foundTask == null) {
             String errorResponse = "{\"error\":\"Task not found\"}";

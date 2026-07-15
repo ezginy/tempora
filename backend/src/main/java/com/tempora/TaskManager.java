@@ -26,4 +26,14 @@ public class TaskManager {
     public List<Task> getAllTasks() {
         return tasks;
     }
+
+    // Finds a task by its id, or returns null if no match is found
+    public Task findById(int id) {
+        for (Task task : tasks) {
+            if (task.getId() == id) {
+                return task;
+            }
+        }
+        return null;
+    }
 }

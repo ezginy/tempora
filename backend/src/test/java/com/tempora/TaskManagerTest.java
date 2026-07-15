@@ -42,4 +42,25 @@ public class TaskManagerTest {
         // after deletion, the task should no longer be in the list
         assertFalse(manager.getAllTasks().contains(task));
     }
+
+    @Test
+    public void testFindByIdReturnsMatchingTask() {
+        TaskManager manager = new TaskManager();
+        Task task = new Task(1, "Findable task", "Desc", Priority.HIGH);
+        manager.addTask(task);
+
+        Task found = manager.findById(1);
+
+        assertEquals(task, found);
+    }
+
+    @Test
+    public void testFindByIdReturnsNullWhenNotFound() {
+        TaskManager manager = new TaskManager();
+        manager.addTask(new Task(1, "Some task", "Desc", Priority.LOW));
+
+        Task found = manager.findById(999);
+
+        assertNull(found);
+    }
 }
