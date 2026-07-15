@@ -18,7 +18,7 @@ public class Main {
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 
-        // GET all tasks and POST a new task
+        // GET all tasks, or POST a new task
         server.createContext("/tasks", exchange -> {
             String method = exchange.getRequestMethod();
 
@@ -68,7 +68,7 @@ public class Main {
         });
 
 
-        // GET a single task by id (path: /tasks/{id})
+        // GET a single task, or PUT to update it (path: /tasks/{id})
         server.createContext("/tasks/", exchange -> {
            String method = exchange.getRequestMethod();
 
@@ -77,24 +77,40 @@ public class Main {
             String[] parts = path.split("/");
             int id = Integer.parseInt(parts[2]);
 
+            // find the task with the matching id (shared by GET and PUT)
+            Task foundTask = null;
+            for (Task task : taskManager.getAllTasks()) {
+                if (task.getId() == id) {
+                    foundTask = task;
+                    break;
+                }
+            }
+
+            if (foundTask == null) {
+                String errorResponse = "{\"error\":\"Task not found\"}";
+                exchange.sendResponseHeaders(404, errorResponse.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(errorResponse.getBytes());
+                os.close();
+                return;
+            }
+
             if (method.equals("GET")) {
-                Task foundTask = null;
+                String response = gson.toJson(foundTask);
+                exchange.sendResponseHeaders(200, response.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
 
-                for (Task task : taskManager.getAllTasks()) {
-                    if (task.getId() == id) {
-                        foundTask = task;
-                        break;
-                    }
-                }
+            } else if (method.equals("PUT")) {
+                InputStream is = exchange.getRequestBody();
+                String requestBody = new String(is.readAllBytes());
 
-                if (foundTask == null) {
-                    String errorResponse = "{\"error\":\"Task not found\"}";
-                    exchange.sendResponseHeaders(404, errorResponse.getBytes().length);
-                    OutputStream os = exchange.getResponseBody();
-                    os.write(errorResponse.getBytes());
-                    os.close();
-                    return;
-                }
+                Task newTask = gson.fromJson(requestBody, Task.class);
+
+                foundTask.setTitle(newTask.getTitle());
+                foundTask.setDescription(newTask.getDescription());
+                foundTask.setPriority(newTask.getPriority());
 
                 String response = gson.toJson(foundTask);
                 exchange.sendResponseHeaders(200, response.getBytes().length);
