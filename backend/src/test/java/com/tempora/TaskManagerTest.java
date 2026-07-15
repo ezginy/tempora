@@ -9,7 +9,7 @@ public class TaskManagerTest {
     public void testAddTask() {
         // start with a fresh, empty manager
         TaskManager manager = new TaskManager();
-        Task task = new Task(1, "Learn JUnit", "Study testing basics", Priority.HIGH);
+        Task task = new Task(1, "Learn JUnit", "Study testing basics", Priority.HIGH, Status.IN_PROGRESS);
 
         manager.addTask(task);
 
@@ -20,8 +20,8 @@ public class TaskManagerTest {
     @Test
     public void testGetAllTasksReturnsAddedTasks() {
         TaskManager manager = new TaskManager();
-        Task task1 = new Task(1, "Task One", "Desc", Priority.LOW);
-        Task task2 = new Task(2, "Task Two", "Desc", Priority.MEDIUM);
+        Task task1 = new Task(1, "Task One", "Desc", Priority.LOW, Status.TODO);
+        Task task2 = new Task(2, "Task Two", "Desc", Priority.MEDIUM, Status.DONE);
 
         manager.addTask(task1);
         manager.addTask(task2);
@@ -34,7 +34,7 @@ public class TaskManagerTest {
     @Test
     public void testDeleteTask() {
         TaskManager manager = new TaskManager();
-        Task task = new Task(1, "Task to delete", "Desc", Priority.HIGH);
+        Task task = new Task(1, "Task to delete", "Desc", Priority.HIGH, Status.IN_PROGRESS);
         manager.addTask(task);
 
         manager.deleteTask(task);
@@ -46,7 +46,7 @@ public class TaskManagerTest {
     @Test
     public void testFindByIdReturnsMatchingTask() {
         TaskManager manager = new TaskManager();
-        Task task = new Task(1, "Findable task", "Desc", Priority.HIGH);
+        Task task = new Task(1, "Findable task", "Desc", Priority.HIGH, Status.DONE);
         manager.addTask(task);
 
         Task found = manager.findById(1);
@@ -57,7 +57,7 @@ public class TaskManagerTest {
     @Test
     public void testFindByIdReturnsNullWhenNotFound() {
         TaskManager manager = new TaskManager();
-        manager.addTask(new Task(1, "Some task", "Desc", Priority.LOW));
+        manager.addTask(new Task(1, "Some task", "Desc", Priority.LOW, Status.TODO));
 
         Task found = manager.findById(999);
 

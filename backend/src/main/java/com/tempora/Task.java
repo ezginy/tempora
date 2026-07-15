@@ -5,12 +5,14 @@ public class Task {
     private String title;
     private String description;
     private Priority priority;
+    private Status status;
 
-    public Task(int id, String title, String description, Priority priority) {
+    public Task(int id, String title, String description, Priority priority, Status status) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.priority = priority;
+        this.status = status;
     }
 
     public int getId() {
@@ -43,6 +45,14 @@ public class Task {
 
     public void setPriority(Priority priority) {
         this.priority = priority;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     // Checks whether this task has the minimum required data (a non-blank title)
