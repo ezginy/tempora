@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
 public class Main {
@@ -17,18 +16,11 @@ public class Main {
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 
-        // define what happens when a request hits "/tasks"
-        server.createContext("/tasks", exchange -> {
+        // GET all tasks, or POST a new task
+        server.createContext("/tasks", new TaskListHandler(taskManager, gson));
 
-            String response = gson.toJson(taskManager.getAllTasks());
-
-            // send status code 200 (OK) along with the response length
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        });
+        // GET a single task, or PUT to update it, or DELETE to remove it (path: /tasks/{id})
+        server.createContext("/tasks/", new TaskDetailHandler(taskManager, gson));
 
         server.start();
 
