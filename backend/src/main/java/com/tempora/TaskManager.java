@@ -17,6 +17,11 @@ public class TaskManager {
         tasks.add(task);
     }
 
+    // Remove the task from the list
+    public void deleteTask(Task task) {
+        tasks.remove(task);
+    }
+
     // Returns the full list of tasks
     public List<Task> getAllTasks() {
         return tasks;

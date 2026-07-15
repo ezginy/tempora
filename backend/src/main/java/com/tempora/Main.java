@@ -118,6 +118,12 @@ public class Main {
                 os.write(response.getBytes());
                 os.close();
 
+            } else if (method.equals("DELETE")) {
+                taskManager.deleteTask(foundTask);
+
+                exchange.sendResponseHeaders(204, -1);
+                exchange.close();
+
             } else {
                 exchange.sendResponseHeaders(405, -1);
                 exchange.close();
