@@ -1,18 +1,38 @@
-import type { Task } from '../types/Task';
+import type { Priority, Task } from "../types/Task";
 
 type TaskCardProps = {
   task: Task;
 };
 
+const priorityStyles = (p: Priority): string => {
+  if (p === "HIGH")
+    return "border border-priority-high text-priority-high shadow-[0_0_8px_var(--color-priority-high)]";
+  else if (p === "MEDIUM")
+    return "border border-priority-medium text-priority-medium shadow-[0_0_8px_var(--color-priority-medium)]";
+  else
+    return "border border-priority-low text-priority-low shadow-[0_0_8px_var(--color-priority-low)]";
+};
+
 function TaskCard(props: TaskCardProps) {
-    return(
-        <div>
-            <h3>{props.task.title}</h3>
-            <p>{props.task.description}</p>
-            <span>{props.task.id}</span>
-            <span>{props.task.priority}</span>
-        </div>
-    );
+  return (
+    <div className="p-4 m-4 rounded-lg shadow-md bg-surface-card flex flex-col items-center">
+      <h3 className="p-1.5 mb-2 w-full bg-surface-card-title rounded-lg text-center text-text-primary">
+        {props.task.title}
+      </h3>
+      <p className="p-2 mb-4 w-full bg-surface-card-desc rounded-md text-center text-text-primary/80">
+        {props.task.description}
+      </p>
+
+      <div className="w-full flex justify-between text-xs">
+        <span className="p-1 text-text-muted/60">#{props.task.id}</span>
+        <span
+          className={`p-1.5 uppercase text-[10px] font-semibold tracking-widest rounded-full bg-surface-card-badge ${priorityStyles(props.task.priority)}`}
+        >
+          {props.task.priority}
+        </span>
+      </div>
+    </div>
+  );
 }
 
 export default TaskCard;
