@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+@theme {
+  --color-priority-low: #22c55e;
+  --color-priority-medium: #eab308;
+  --color-priority-high: #ef4444;
+}
