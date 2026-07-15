@@ -8,7 +8,7 @@ type ColumnProps = {
 
 function Column(props: ColumnProps) {
   return (
-    <div className="p-8 m-8 bg-stone-900 flex flex-col gap-4 min-w-72">
+    <div className="p-8 bg-stone-900 flex flex-col gap-4 min-w-72">
       <h2 className="mb-8 font-semibold text-2xl text-center text-white">
         {props.title}
       </h2>
