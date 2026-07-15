@@ -44,4 +44,9 @@ public class Task {
     public void setPriority(Priority priority) {
         this.priority = priority;
     }
+
+    // Checks whether this task has the minimum required data (a non-blank title)
+    public boolean isValid() {
+        return title != null && !title.isBlank();
+    }
 }
