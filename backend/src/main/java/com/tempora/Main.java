@@ -17,10 +17,12 @@ public class Main {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 
         // GET all tasks, or POST a new task
-        server.createContext("/tasks", new TaskListHandler(taskManager, gson));
+        var tasksContext = server.createContext("/tasks", new TaskListHandler(taskManager, gson));
+        tasksContext.getFilters().add(new CorsFilter());
 
         // GET a single task, or PUT to update it, or DELETE to remove it (path: /tasks/{id})
-        server.createContext("/tasks/", new TaskDetailHandler(taskManager, gson));
+        var taskDetailContext = server.createContext("/tasks/", new TaskDetailHandler(taskManager, gson));
+        taskDetailContext.getFilters().add(new CorsFilter());
 
         server.start();
 
