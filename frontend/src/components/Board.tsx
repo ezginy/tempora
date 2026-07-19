@@ -15,49 +15,9 @@ function Board() {
     fetchTasks();
   }, []);
 
-  const todoTasks: Task[] = [
-    {
-      id: 1,
-      title: "Task 111",
-      description: "desc",
-      priority: "LOW",
-      status: "TODO",
-    },
-    {
-      id: 2,
-      title: "Task 222",
-      description: "desc",
-      priority: "MEDIUM",
-      status: "DONE",
-    },
-  ];
-
-  const inProgressTasks: Task[] = [
-    {
-      id: 3,
-      title: "Task 333",
-      description: "desc",
-      priority: "HIGH",
-      status: "IN_PROGRESS",
-    },
-  ];
-
-  const doneTasks: Task[] = [
-    {
-      id: 4,
-      title: "Task 111",
-      description: "desc",
-      priority: "MEDIUM",
-      status: "IN_PROGRESS",
-    },
-    {
-      id: 5,
-      title: "Task 222",
-      description: "desc",
-      priority: "MEDIUM",
-      status: "DONE",
-    },
-  ];
+  const todoTasks = tasks.filter((task) => task.status === "TODO");
+  const inProgressTasks = tasks.filter((task) => task.status === "IN_PROGRESS");
+  const doneTasks = tasks.filter((task) => task.status === "DONE");
 
   return (
     <div className="p-4 flex flex-row gap-8 bg-surface-page min-h-screen">
