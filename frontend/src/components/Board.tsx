@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { DndContext } from "@dnd-kit/core";
 import type { Task } from "../types/Task";
 import Column from "./Column";
 
@@ -28,14 +29,16 @@ function Board() {
   const doneTasks = tasks.filter((task) => task.status === "DONE");
 
   return (
-    <div className="p-4 flex flex-row gap-8 bg-surface-page min-h-screen">
-      {isLoading && <p className="text-text-primary">Loading tasks...</p>}
-      {error && <p className="text-priority-high">{error}</p>}
+    <DndContext>
+      <div className="p-4 flex flex-row gap-8 bg-surface-page min-h-screen">
+        {isLoading && <p className="text-text-primary">Loading tasks...</p>}
+        {error && <p className="text-priority-high">{error}</p>}
 
-      <Column title="To Do" tasks={todoTasks}></Column>
-      <Column title="In Progress" tasks={inProgressTasks}></Column>
-      <Column title="Done" tasks={doneTasks}></Column>
-    </div>
+        <Column title="To Do" tasks={todoTasks}></Column>
+        <Column title="In Progress" tasks={inProgressTasks}></Column>
+        <Column title="Done" tasks={doneTasks}></Column>
+      </div>
+    </DndContext>
   );
 }
 
