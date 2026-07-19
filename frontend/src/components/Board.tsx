@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { DndContext } from "@dnd-kit/core";
-import type { Task } from "../types/Task";
+import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import type { Status, Task } from "../types/Task";
 import Column from "./Column";
 
 function Board() {
@@ -24,19 +24,35 @@ function Board() {
     fetchTasks();
   }, []);
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    if (!event.over) return;
+
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === event.active.id
+          ? { ...task, status: event.over!.id as Status }
+          : task
+      )
+    );
+  };
+
   const todoTasks = tasks.filter((task) => task.status === "TODO");
   const inProgressTasks = tasks.filter((task) => task.status === "IN_PROGRESS");
   const doneTasks = tasks.filter((task) => task.status === "DONE");
 
   return (
-    <DndContext>
+    <DndContext onDragEnd={handleDragEnd}>
       <div className="p-4 flex flex-row gap-8 bg-surface-page min-h-screen">
         {isLoading && <p className="text-text-primary">Loading tasks...</p>}
         {error && <p className="text-priority-high">{error}</p>}
 
-        <Column title="To Do" tasks={todoTasks}></Column>
-        <Column title="In Progress" tasks={inProgressTasks}></Column>
-        <Column title="Done" tasks={doneTasks}></Column>
+        <Column title="To Do" tasks={todoTasks} status="TODO"></Column>
+        <Column
+          title="In Progress"
+          tasks={inProgressTasks}
+          status="IN_PROGRESS"
+        ></Column>
+        <Column title="Done" tasks={doneTasks} status="DONE"></Column>
       </div>
     </DndContext>
   );
