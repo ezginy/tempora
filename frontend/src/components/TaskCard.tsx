@@ -1,3 +1,5 @@
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 import type { Priority, Task } from "../types/Task";
 
 type TaskCardProps = {
@@ -14,8 +16,22 @@ const priorityStyles = (p: Priority): string => {
 };
 
 function TaskCard(props: TaskCardProps) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: props.task.id,
+    });
+
   return (
-    <div className="p-4 m-4 rounded-lg shadow-md bg-surface-card flex flex-col items-center">
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      style={{
+        transform: CSS.Translate.toString(transform),
+        opacity: isDragging ? 0.5 : 1,
+      }}
+      className="p-4 m-4 rounded-lg shadow-md bg-surface-card flex flex-col items-center"
+    >
       <h3 className="p-1.5 mb-2 w-full bg-surface-card-title rounded-lg text-center text-text-primary">
         {props.task.title}
       </h3>
