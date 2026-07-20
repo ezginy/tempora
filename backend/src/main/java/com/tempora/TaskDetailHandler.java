@@ -51,12 +51,20 @@ public class TaskDetailHandler implements HttpHandler {
                 InputStream is = exchange.getRequestBody();
                 String requestBody = new String(is.readAllBytes());
 
-                Task newTask = gson.fromJson(requestBody, Task.class);
+                Task taskUpdates = gson.fromJson(requestBody, Task.class);
 
-                foundTask.setTitle(newTask.getTitle());
-                foundTask.setDescription(newTask.getDescription());
-                foundTask.setPriority(newTask.getPriority());
-                foundTask.setStatus(newTask.getStatus());
+                if (taskUpdates.getTitle() != null) {
+                    foundTask.setTitle(taskUpdates.getTitle());
+                }
+                if (taskUpdates.getDescription() != null) {
+                    foundTask.setDescription(taskUpdates.getDescription());
+                }
+                if (taskUpdates.getPriority() != null) {
+                    foundTask.setPriority(taskUpdates.getPriority());
+                }
+                if (taskUpdates.getStatus() != null) {
+                    foundTask.setStatus(taskUpdates.getStatus());
+                }
 
                 String response = gson.toJson(foundTask);
                 exchange.sendResponseHeaders(200, response.getBytes().length);
