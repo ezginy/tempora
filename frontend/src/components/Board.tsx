@@ -12,6 +12,7 @@ function Board() {
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [newPriority, setNewPriority] = useState<Priority>("LOW");
+  const [titleError, setTitleError] = useState(false);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -42,6 +43,12 @@ function Board() {
   };
 
   const handleAddTask = async () => {
+    if (!newTitle.trim()) {
+      setTitleError(true);
+      return;
+    }
+    setTitleError(false);
+
     const response = await fetch("http://localhost:8080/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -95,8 +102,12 @@ function Board() {
               placeholder="Title"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              className="p-2 rounded-md bg-surface-card-title text-text-primary"
+              className={`p-2 rounded-md bg-surface-card-title text-text-primary 
+                ${titleError ? "border border-priority-high" : ""}`}
             />
+            {titleError && (
+              <p className="text-priority-high text-sm">Title is required</p>
+            )}
             <textarea
               placeholder="Description"
               value={newDescription}
