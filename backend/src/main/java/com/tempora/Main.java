@@ -14,7 +14,11 @@ public class Main {
 
         Gson gson = new Gson();
 
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        // Render gives us the port via an environment variable; fall back to 8080 for local dev
+        String portEnv = System.getenv("PORT");
+        int port = (portEnv != null) ? Integer.parseInt(portEnv) : 8080;
+
+        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
         // GET all tasks, or POST a new task
         var tasksContext = server.createContext("/tasks", new TaskListHandler(taskManager, gson));
@@ -26,6 +30,6 @@ public class Main {
 
         server.start();
 
-        System.out.println("Tempora backend is running on port 8080...");
+        System.out.println("Tempora backend is running on port " + port + "...");
     }
 }
