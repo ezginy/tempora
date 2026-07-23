@@ -1,9 +1,12 @@
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import type { Priority, Task } from "../types/Task";
+import { Trash2, Pencil } from "lucide-react";
 
 type TaskCardProps = {
   task: Task;
+  onDeleteTask: (id: number) => void;
+  onEditTask: (task: Task) => void;
 };
 
 const priorityStyles = (p: Priority): string => {
@@ -32,6 +35,27 @@ function TaskCard(props: TaskCardProps) {
       }}
       className="p-4 m-4 rounded-lg shadow-md bg-surface-card flex flex-col items-center"
     >
+      <div className="mb-3 w-full flex justify-end gap-2 text-xs">
+        <button
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => {
+            if (window.confirm(`Delete "${props.task.title}"?`)) {
+              props.onDeleteTask(props.task.id);
+            }
+          }}
+          className="text-priority-high hover:opacity-70 transition-opacity"
+        >
+          <Trash2 size={16} />
+        </button>
+        <button
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => props.onEditTask(props.task)}
+          className="text-priority-medium hover:opacity-70 transition-opacity"
+        >
+          <Pencil size={16} />
+        </button>
+      </div>
+
       <h3 className="p-1.5 mb-2 w-full bg-surface-card-title rounded-lg text-center text-text-primary">
         {props.task.title}
       </h3>
