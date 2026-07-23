@@ -38,7 +38,11 @@ function TaskCard(props: TaskCardProps) {
       <div className="mb-3 w-full flex justify-end gap-2 text-xs">
         <button
           onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => props.onDeleteTask(props.task.id)}
+          onClick={() => {
+            if (window.confirm(`Delete "${props.task.title}"?`)) {
+              props.onDeleteTask(props.task.id);
+            }
+          }}
           className="text-priority-high hover:opacity-70 transition-opacity"
         >
           <Trash2 size={16} />

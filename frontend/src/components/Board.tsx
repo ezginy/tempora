@@ -85,11 +85,8 @@ function Board() {
       setTasks((prevTasks) => [...prevTasks, createdTask]);
     }
 
-    setNewTitle("");
-    setNewDescription("");
-    setNewPriority("LOW");
     setIsModalOpen(false);
-    setEditingTaskId(null);
+    resetForm();
   };
 
   const handleDeleteTask = async (id: number) => {
@@ -108,6 +105,14 @@ function Board() {
     setIsModalOpen(true);
   };
 
+  const resetForm = () => {
+    setNewTitle("");
+    setNewDescription("");
+    setNewPriority("LOW");
+    setTitleError(false);
+    setEditingTaskId(null);
+  };
+
   const todoTasks = tasks.filter((task) => task.status === "TODO");
   const inProgressTasks = tasks.filter((task) => task.status === "IN_PROGRESS");
   const doneTasks = tasks.filter((task) => task.status === "DONE");
@@ -119,7 +124,10 @@ function Board() {
         {error && <p className="text-priority-high">{error}</p>}
 
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setIsModalOpen(true);
+            resetForm();
+          }}
           className="px-3 py-2 rounded-md bg-accent text-surface-page font-semibold hover:opacity-80 transition-opacity self-start"
         >
           + Add Task
@@ -182,7 +190,7 @@ function Board() {
               <button
                 onClick={() => {
                   setIsModalOpen(false);
-                  setEditingTaskId(null);
+                  resetForm();
                 }}
                 className="px-3 py-2 rounded-md border border-text-muted text-text-muted hover:text-text-primary hover:border-text-primary transition-colors"
               >
