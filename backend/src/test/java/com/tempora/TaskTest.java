@@ -13,7 +13,7 @@ public class TaskTest {
 
         // check that each field holds what we expect
         assertEquals(1, task.getId());
-        assertEquals("Wrong title", task.getTitle());
+        assertEquals("Learn JUnit", task.getTitle());
         assertEquals("Testing testing testing", task.getDescription());
         assertEquals(Priority.MEDIUM, task.getPriority());
     }
