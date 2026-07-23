@@ -68,6 +68,14 @@ function Board() {
     setIsModalOpen(false);
   };
 
+  const handleDeleteTask = async (id: number) => {
+    await fetch(`http://localhost:8080/tasks/${id}`, {
+      method: "DELETE",
+    });
+
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+  };
+
   const todoTasks = tasks.filter((task) => task.status === "TODO");
   const inProgressTasks = tasks.filter((task) => task.status === "IN_PROGRESS");
   const doneTasks = tasks.filter((task) => task.status === "DONE");
@@ -85,13 +93,24 @@ function Board() {
           Add Task
         </button>
 
-        <Column title="To Do" tasks={todoTasks} status="TODO"></Column>
+        <Column
+          title="To Do"
+          tasks={todoTasks}
+          status="TODO"
+          onDeleteTask={handleDeleteTask}
+        ></Column>
         <Column
           title="In Progress"
           tasks={inProgressTasks}
           status="IN_PROGRESS"
+          onDeleteTask={handleDeleteTask}
         ></Column>
-        <Column title="Done" tasks={doneTasks} status="DONE"></Column>
+        <Column
+          title="Done"
+          tasks={doneTasks}
+          status="DONE"
+          onDeleteTask={handleDeleteTask}
+        ></Column>
       </div>
 
       {isModalOpen && (
