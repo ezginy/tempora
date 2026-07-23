@@ -8,6 +8,7 @@ function Board() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
@@ -42,30 +43,53 @@ function Board() {
     );
   };
 
-  const handleAddTask = async () => {
+  const handleSubmitTask = async () => {
     if (!newTitle.trim()) {
       setTitleError(true);
       return;
     }
     setTitleError(false);
 
-    const response = await fetch("http://localhost:8080/tasks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: newTitle,
-        description: newDescription,
-        priority: newPriority,
-      }),
-    });
+    const taskData = {
+      title: newTitle,
+      description: newDescription,
+      priority: newPriority,
+    };
 
-    const createdTask = await response.json();
-    setTasks((prevTasks) => [...prevTasks, createdTask]);
+    if (editingTaskId) {
+      // edit mod: PUT request
+      const response = await fetch(
+        `http://localhost:8080/tasks/${editingTaskId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(taskData),
+        }
+      );
+      const updatedTask = await response.json();
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === editingTaskId ? updatedTask : task
+        )
+      );
+    } else {
+      // create mod: POST request
+      const response = await fetch("http://localhost:8080/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(taskData),
+      });
+      const createdTask = await response.json();
+
+      setTasks((prevTasks) => [...prevTasks, createdTask]);
+    }
 
     setNewTitle("");
     setNewDescription("");
     setNewPriority("LOW");
     setIsModalOpen(false);
+    setEditingTaskId(null);
   };
 
   const handleDeleteTask = async (id: number) => {
@@ -74,6 +98,14 @@ function Board() {
     });
 
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTaskId(task.id);
+    setNewTitle(task.title);
+    setNewDescription(task.description);
+    setNewPriority(task.priority);
+    setIsModalOpen(true);
   };
 
   const todoTasks = tasks.filter((task) => task.status === "TODO");
@@ -90,7 +122,7 @@ function Board() {
           onClick={() => setIsModalOpen(true)}
           className="px-3 py-2 rounded-md bg-accent text-surface-page font-semibold hover:opacity-80 transition-opacity self-start"
         >
-          Add Task
+          + Add Task
         </button>
 
         <Column
@@ -98,18 +130,21 @@ function Board() {
           tasks={todoTasks}
           status="TODO"
           onDeleteTask={handleDeleteTask}
+          onEditTask={handleEditTask}
         ></Column>
         <Column
           title="In Progress"
           tasks={inProgressTasks}
           status="IN_PROGRESS"
           onDeleteTask={handleDeleteTask}
+          onEditTask={handleEditTask}
         ></Column>
         <Column
           title="Done"
           tasks={doneTasks}
           status="DONE"
           onDeleteTask={handleDeleteTask}
+          onEditTask={handleEditTask}
         ></Column>
       </div>
 
@@ -145,16 +180,19 @@ function Board() {
 
             <div className="flex justify-between mt-2">
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingTaskId(null);
+                }}
                 className="px-3 py-2 rounded-md border border-text-muted text-text-muted hover:text-text-primary hover:border-text-primary transition-colors"
               >
                 Cancel
               </button>
               <button
-                onClick={handleAddTask}
+                onClick={handleSubmitTask}
                 className="px-3 py-2 rounded-md bg-priority-low text-surface-page font-semibold hover:opacity-80 transition-opacity"
               >
-                Add Task
+                {editingTaskId ? "Save" : "Add Task"}
               </button>
             </div>
           </div>

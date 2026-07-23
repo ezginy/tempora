@@ -7,6 +7,7 @@ type ColumnProps = {
   tasks: Task[];
   status: Status;
   onDeleteTask: (id: number) => void;
+  onEditTask: (task: Task) => void;
 };
 
 function Column(props: ColumnProps) {
@@ -24,7 +25,12 @@ function Column(props: ColumnProps) {
       </h2>
 
       {props.tasks.map((task) => (
-        <TaskCard task={task} key={task.id} onDeleteTask={props.onDeleteTask} />
+        <TaskCard
+          task={task}
+          key={task.id}
+          onDeleteTask={props.onDeleteTask}
+          onEditTask={props.onEditTask}
+        />
       ))}
     </div>
   );
