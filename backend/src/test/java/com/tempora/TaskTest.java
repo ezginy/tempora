@@ -1,6 +1,7 @@
 package com.tempora;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskTest {
@@ -12,7 +13,7 @@ public class TaskTest {
 
         // check that each field holds what we expect
         assertEquals(1, task.getId());
-        assertEquals("Learn JUnit", task.getTitle());
+        assertEquals("Wrong title", task.getTitle());
         assertEquals("Testing testing testing", task.getDescription());
         assertEquals(Priority.MEDIUM, task.getPriority());
     }
