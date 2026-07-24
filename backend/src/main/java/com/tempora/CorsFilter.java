@@ -8,10 +8,11 @@ import java.util.List;
 
 public class CorsFilter extends Filter {
 
-    // known frontend addresses allowed to call this API during development
+    // frontend addresses allowed to call this API (local dev + production)
     private static final List<String> ALLOWED_ORIGINS = List.of(
             "http://localhost:5173",
-            "http://127.0.0.1:5173"
+            "http://127.0.0.1:5173",
+            "https://tempora-gray.vercel.app"
     );
 
     @Override

@@ -3,10 +3,8 @@ name: Backend CI
 on:
   push:
     branches: [main]
-    paths: ['backend/**']
   pull_request:
     branches: [main]
-    paths: ['backend/**']
 
 jobs:
   test:
@@ -16,7 +14,16 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v4
 
+      - name: Check if backend changed
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+
       - name: Set up Java 17
+        if: steps.filter.outputs.backend == 'true'
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -24,5 +31,6 @@ jobs:
           cache: maven
 
       - name: Run backend tests
+        if: steps.filter.outputs.backend == 'true'
         working-directory: backend
         run: mvn test
