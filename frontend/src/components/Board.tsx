@@ -3,6 +3,8 @@ import { DndContext, type DragEndEvent } from "@dnd-kit/core";
 import type { Priority, Status, Task } from "../types/Task";
 import Column from "./Column";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Board() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -18,7 +20,7 @@ function Board() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch("http://localhost:8080/tasks");
+        const response = await fetch(`${API_URL}/tasks`);
         const data = await response.json();
         setTasks(data);
       } catch (e) {
@@ -59,7 +61,7 @@ function Board() {
     if (editingTaskId) {
       // edit mod: PUT request
       const response = await fetch(
-        `http://localhost:8080/tasks/${editingTaskId}`,
+        `${API_URL}/tasks/${editingTaskId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -75,7 +77,7 @@ function Board() {
       );
     } else {
       // create mod: POST request
-      const response = await fetch("http://localhost:8080/tasks", {
+      const response = await fetch(`${API_URL}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(taskData),
@@ -90,7 +92,7 @@ function Board() {
   };
 
   const handleDeleteTask = async (id: number) => {
-    await fetch(`http://localhost:8080/tasks/${id}`, {
+    await fetch(`${API_URL}/tasks/${id}`, {
       method: "DELETE",
     });
 
