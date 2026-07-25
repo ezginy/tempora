@@ -60,14 +60,11 @@ function Board() {
 
     if (editingTaskId) {
       // edit mod: PUT request
-      const response = await fetch(
-        `${API_URL}/tasks/${editingTaskId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(taskData),
-        }
-      );
+      const response = await fetch(`${API_URL}/tasks/${editingTaskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(taskData),
+      });
       const updatedTask = await response.json();
 
       setTasks((prevTasks) =>
@@ -121,7 +118,7 @@ function Board() {
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <div className="p-4 flex flex-row gap-8 bg-surface-page min-h-screen">
+      <div className="p-4 flex flex-col gap-6 bg-surface-page min-h-screen w-full">
         {isLoading && <p className="text-text-primary">Loading tasks...</p>}
         {error && <p className="text-priority-high">{error}</p>}
 
@@ -130,32 +127,34 @@ function Board() {
             setIsModalOpen(true);
             resetForm();
           }}
-          className="px-3 py-2 rounded-md bg-accent text-surface-page font-semibold hover:opacity-80 transition-opacity self-start"
+          className="px-3 py-1.5 rounded-lg bg-accent text-surface-page font-semibold hover:opacity-80 transition-opacity self-end"
         >
           + Add Task
         </button>
 
-        <Column
-          title="To Do"
-          tasks={todoTasks}
-          status="TODO"
-          onDeleteTask={handleDeleteTask}
-          onEditTask={handleEditTask}
-        ></Column>
-        <Column
-          title="In Progress"
-          tasks={inProgressTasks}
-          status="IN_PROGRESS"
-          onDeleteTask={handleDeleteTask}
-          onEditTask={handleEditTask}
-        ></Column>
-        <Column
-          title="Done"
-          tasks={doneTasks}
-          status="DONE"
-          onDeleteTask={handleDeleteTask}
-          onEditTask={handleEditTask}
-        ></Column>
+        <div className="flex flex-row gap-8 w-full justify-center">
+          <Column
+            title="To Do"
+            tasks={todoTasks}
+            status="TODO"
+            onDeleteTask={handleDeleteTask}
+            onEditTask={handleEditTask}
+          ></Column>
+          <Column
+            title="In Progress"
+            tasks={inProgressTasks}
+            status="IN_PROGRESS"
+            onDeleteTask={handleDeleteTask}
+            onEditTask={handleEditTask}
+          ></Column>
+          <Column
+            title="Done"
+            tasks={doneTasks}
+            status="DONE"
+            onDeleteTask={handleDeleteTask}
+            onEditTask={handleEditTask}
+          ></Column>
+        </div>
       </div>
 
       {isModalOpen && (
