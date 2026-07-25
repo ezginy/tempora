@@ -1,7 +1,8 @@
+import { useState, useEffect, useRef } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import type { Priority, Task } from "../types/Task";
-import { Trash2, Pencil } from "lucide-react";
+import { Trash2, Pencil, MoreHorizontal } from "lucide-react";
 
 type TaskCardProps = {
   task: Task;
@@ -11,11 +12,11 @@ type TaskCardProps = {
 
 const priorityStyles = (p: Priority): string => {
   if (p === "HIGH")
-    return "border border-priority-high text-priority-high shadow-[0_0_8px_var(--color-priority-high)]";
+    return "border border-priority-high/20 text-priority-high bg-priority-high/10";
   else if (p === "MEDIUM")
-    return "border border-priority-medium text-priority-medium shadow-[0_0_8px_var(--color-priority-medium)]";
+    return "border border-priority-medium/20 text-priority-medium bg-priority-medium/10";
   else
-    return "border border-priority-low text-priority-low shadow-[0_0_8px_var(--color-priority-low)]";
+    return "border border-priority-low/20 text-priority-low bg-priority-low/10";
 };
 
 function TaskCard(props: TaskCardProps) {
@@ -23,6 +24,25 @@ function TaskCard(props: TaskCardProps) {
     useDraggable({
       id: props.task.id,
     });
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   return (
     <div
@@ -33,42 +53,70 @@ function TaskCard(props: TaskCardProps) {
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 0.5 : 1,
       }}
-      className="p-4 m-4 rounded-lg shadow-md bg-surface-card flex flex-col items-center"
+      className="p-4 rounded-xl border border-surface-sidebar bg-surface-card flex flex-col gap-3 w-full group hover:border-text-muted/30 transition-colors relative"
     >
-      <div className="mb-3 w-full flex justify-end gap-2 text-xs">
-        <button
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => {
-            if (window.confirm(`Delete "${props.task.title}"?`)) {
-              props.onDeleteTask(props.task.id);
-            }
-          }}
-          className="text-priority-high hover:opacity-70 transition-opacity"
-        >
-          <Trash2 size={16} />
-        </button>
-        <button
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => props.onEditTask(props.task)}
-          className="text-priority-medium hover:opacity-70 transition-opacity"
-        >
-          <Pencil size={16} />
-        </button>
-      </div>
-
-      <h3 className="p-1.5 mb-2 w-full bg-surface-card-title rounded-lg text-center text-text-primary">
-        {props.task.title}
-      </h3>
-      <p className="p-2 mb-4 w-full bg-surface-card-desc rounded-md text-center text-text-primary/80">
-        {props.task.description}
-      </p>
-
-      <div className="w-full flex justify-between text-xs">
-        <span className="p-1 text-text-muted/60">#{props.task.id}</span>
+      <div className="flex justify-between items-start w-full">
         <span
-          className={`p-1.5 uppercase text-[10px] font-semibold tracking-widest rounded-full bg-surface-card-badge ${priorityStyles(props.task.priority)}`}
+          className={`w-fit px-2.5 py-1 uppercase text-[10px] font-bold tracking-wider rounded-full ${priorityStyles(props.task.priority)}`}
         >
           {props.task.priority}
+        </span>
+
+        <div className="relative">
+          <button
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-text-muted hover:text-text-primary p-1 rounded-md hover:bg-surface-sidebar transition-colors"
+          >
+            <MoreHorizontal size={16} />
+          </button>
+
+          {isMenuOpen && (
+            <div
+              ref={menuRef}
+              className="absolute right-0 top-full mt-1 w-28 bg-surface-column border border-surface-sidebar rounded-md shadow-lg overflow-hidden z-10 flex flex-col"
+            >
+              <button
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  props.onEditTask(props.task);
+                }}
+                className="flex items-center gap-2 px-3 py-2 text-xs text-text-primary hover:bg-surface-sidebar text-left transition-colors"
+              >
+                <Pencil size={14} /> Edit
+              </button>
+              <button
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  if (window.confirm(`Delete "${props.task.title}"?`)) {
+                    props.onDeleteTask(props.task.id);
+                  }
+                }}
+                className="flex items-center gap-2 px-3 py-2 text-xs text-priority-high hover:bg-priority-high/10 text-left transition-colors"
+              >
+                <Trash2 size={14} /> Delete
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-1 w-full text-left">
+        <h3 className="text-sm font-medium text-text-primary leading-snug">
+          {props.task.title}
+        </h3>
+        {props.task.description && (
+          <p className="text-xs text-text-muted line-clamp-2 leading-relaxed">
+            {props.task.description}
+          </p>
+        )}
+      </div>
+
+      <div className="w-full mt-1 text-left">
+        <span className="text-[10px] text-text-muted/40 font-mono font-medium">
+          #{props.task.id}
         </span>
       </div>
     </div>

@@ -20,18 +20,25 @@ function Column(props: ColumnProps) {
       ref={setNodeRef}
       className="p-8 bg-surface-column rounded-2xl flex flex-col gap-4 min-w-72"
     >
-      <h2 className="mb-8 font-semibold text-2xl text-center text-text-primary">
-        {props.title}
-      </h2>
+      <div className="flex items-center gap-3 pb-4 border-b border-surface-sidebar px-1">
+        <h2 className="font-semibold text-lg text-text-primary tracking-wide">
+          {props.title}
+        </h2>
+        <span className="flex items-center justify-center min-w-6 h-6 px-2 rounded-full bg-surface-card-badge text-xs font-semibold text-text-muted">
+          {props.tasks.length}
+        </span>
+      </div>
 
-      {props.tasks.map((task) => (
-        <TaskCard
-          task={task}
-          key={task.id}
-          onDeleteTask={props.onDeleteTask}
-          onEditTask={props.onEditTask}
-        />
-      ))}
+      <div className="flex flex-col gap-3">
+        {props.tasks.map((task) => (
+          <TaskCard
+            task={task}
+            key={task.id}
+            onDeleteTask={props.onDeleteTask}
+            onEditTask={props.onEditTask}
+          />
+        ))}
+      </div>
     </div>
   );
 }

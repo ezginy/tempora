@@ -60,14 +60,11 @@ function Board() {
 
     if (editingTaskId) {
       // edit mod: PUT request
-      const response = await fetch(
-        `${API_URL}/tasks/${editingTaskId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(taskData),
-        }
-      );
+      const response = await fetch(`${API_URL}/tasks/${editingTaskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(taskData),
+      });
       const updatedTask = await response.json();
 
       setTasks((prevTasks) =>
@@ -121,7 +118,7 @@ function Board() {
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <div className="p-4 flex flex-row gap-8 bg-surface-page min-h-screen">
+      <div className="p-4 flex flex-row gap-8 bg-surface-page min-h-screen w-full">
         {isLoading && <p className="text-text-primary">Loading tasks...</p>}
         {error && <p className="text-priority-high">{error}</p>}
 

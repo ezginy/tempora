@@ -1,11 +1,13 @@
 import Board from "./components/Board";
 import "./App.css";
+import Sidebar from "./components/Sidebar";
 
 function App() {
   return (
-    <>
-      <Board></Board>
-    </>
+    <div className="flex bg-surface-sidebar">
+      <Sidebar />
+      <Board />
+    </div>
   );
 }
 
