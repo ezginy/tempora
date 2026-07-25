@@ -18,7 +18,7 @@ function Column(props: ColumnProps) {
   return (
     <div
       ref={setNodeRef}
-      className="p-8 bg-surface-column rounded-2xl flex flex-col gap-4 min-w-84"
+      className="p-4 md:p-8 bg-surface-column rounded-2xl flex flex-col gap-4 md:min-w-84"
     >
       <div className="flex items-center gap-3 pb-4 border-b border-surface-sidebar px-1">
         <h2 className="font-semibold text-lg text-text-primary tracking-wide">
