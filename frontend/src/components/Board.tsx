@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
-import { DndContext, type DragEndEvent } from "@dnd-kit/core";
 import type { Priority, Status, Task } from "../types/Task";
 import Column from "./Column";
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -116,9 +122,13 @@ function Board() {
   const inProgressTasks = tasks.filter((task) => task.status === "IN_PROGRESS");
   const doneTasks = tasks.filter((task) => task.status === "DONE");
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+
   return (
-    <DndContext onDragEnd={handleDragEnd}>
-      <div className="p-4 flex flex-col gap-6 bg-surface-page min-h-screen w-full">
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <div className="p-4 flex flex-col gap-6 bg-surface-page min-h-screen w-full overflow-x-hidden">
         {isLoading && <p className="text-text-primary">Loading tasks...</p>}
         {error && <p className="text-priority-high">{error}</p>}
 
@@ -132,7 +142,7 @@ function Board() {
           + Add Task
         </button>
 
-        <div className="flex flex-row gap-8 w-full justify-center">
+        <div className="flex flex-col md:flex-row gap-8 w-full md:justify-center">
           <Column
             title="To Do"
             tasks={todoTasks}
