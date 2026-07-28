@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Priority, Status, Task } from "../types/Task";
-import Column from "./Column";
+import Column from "../components/Column";
 import {
   DndContext,
   PointerSensor,
@@ -128,7 +128,7 @@ function Board() {
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="p-4 flex flex-col gap-6 bg-surface-page min-h-screen w-full overflow-x-hidden">
+      <div className="p-4 flex flex-col gap-6 bg-surface-page min-h-screen flex-1 overflow-x-hidden">
         {isLoading && <p className="text-text-primary">Loading tasks...</p>}
         {error && <p className="text-priority-high">{error}</p>}
 

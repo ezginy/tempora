@@ -52,6 +52,7 @@ function TaskCard(props: TaskCardProps) {
       style={{
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 0.5 : 1,
+        touchAction: "none",
       }}
       className="p-4 rounded-xl border border-surface-sidebar bg-surface-card flex flex-col gap-3 w-full group hover:border-text-muted/30 transition-colors relative"
     >
