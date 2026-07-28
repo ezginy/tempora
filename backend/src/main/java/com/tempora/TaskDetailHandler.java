@@ -67,6 +67,8 @@ public class TaskDetailHandler implements HttpHandler {
                         foundTask.setStatus(taskUpdates.getStatus());
                     }
 
+                    taskManager.update(foundTask);
+                    
                     String response = gson.toJson(foundTask);
                     exchange.sendResponseHeaders(200, response.getBytes().length);
                     OutputStream os = exchange.getResponseBody();

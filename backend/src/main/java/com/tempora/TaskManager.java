@@ -10,14 +10,7 @@ import java.sql.SQLException;
 
 public class TaskManager {
 
-    private List<Task> tasks;  // still used by addTask/deleteTask for now
-
-    // Constructor: starts with an empty task list
-    public TaskManager() {
-        this.tasks = new ArrayList<>();
-    }
-
-    // Adds a new task to the list
+    // Adds a new task to the database
     public void addTask(Task task) throws SQLException {
         String sql = "INSERT INTO tasks (title, description, priority, status) VALUES (?, ?, ?, ?)";
 
@@ -91,5 +84,22 @@ public class TaskManager {
             }
         }
         return null;
+    }
+
+    // Updates an existing task in the database
+    public void update(Task task) throws SQLException {
+        String sql = "UPDATE tasks SET title = ?, description = ?, priority = ?, status = ? WHERE id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, task.getTitle());
+            statement.setString(2, task.getDescription());
+            statement.setString(3, task.getPriority().toString());
+            statement.setString(4, task.getStatus().toString());
+            statement.setInt(5, task.getId());
+
+            statement.executeUpdate();
+        }
     }
 }
