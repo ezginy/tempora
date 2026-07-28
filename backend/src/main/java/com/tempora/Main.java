@@ -5,11 +5,14 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.sql.SQLException;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        TaskManager taskManager = new TaskManager();
+    
+    public static void main(String[] args) throws IOException, SQLException {
+        DatabaseConnection.runSchema();
 
+        TaskManager taskManager = new TaskManager();
         Gson gson = new Gson();
 
         // Render gives us the port via an environment variable; fall back to 8080 for local dev
