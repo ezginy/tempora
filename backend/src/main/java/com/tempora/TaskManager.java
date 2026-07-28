@@ -18,13 +18,31 @@ public class TaskManager {
     }
 
     // Adds a new task to the list
-    public void addTask(Task task) {
-        tasks.add(task);
+    public void addTask(Task task) throws SQLException {
+        String sql = "INSERT INTO tasks (title, description, priority, status) VALUES (?, ?, ?, ?)";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, task.getTitle());
+            statement.setString(2, task.getDescription());
+            statement.setString(3, task.getPriority().toString());
+            statement.setString(4, task.getStatus().toString());
+
+            statement.executeUpdate();
+        }
     }
 
-    // Remove the task from the list
-    public void deleteTask(Task task) {
-        tasks.remove(task);
+    // Deletes the task with the given id
+    public void deleteTask(int id) throws SQLException {
+        String sql = "DELETE FROM tasks WHERE id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        }
     }
 
     // Returns the full list of tasks
