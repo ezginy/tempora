@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { LayoutDashboard, BarChart3, Settings, Menu, X } from "lucide-react";
+import TemporaIcon from "./TemporaIcon";
 
 function Sidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -33,7 +34,10 @@ function Sidebar() {
         }`}
       >
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-xl font-bold text-text-primary">Tempora</h1>
+          <div className="flex items-center gap-2 mb-8">
+            <TemporaIcon />
+            <h1 className="text-xl font-bold text-text-primary">Tempora</h1>
+          </div>
           <button
             onClick={() => setIsSidebarOpen(false)}
             className="md:hidden text-text-muted"
