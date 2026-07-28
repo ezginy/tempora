@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.SQLException;
 
 public class TaskDetailHandler implements HttpHandler {
     private TaskManager taskManager;
@@ -26,63 +27,72 @@ public class TaskDetailHandler implements HttpHandler {
         String[] parts = path.split("/");
         int id = Integer.parseInt(parts[2]);
 
-        // find the task with the matching id (shared by GET and PUT)
-        Task foundTask = taskManager.findById(id);
+        try {
+            Task foundTask = taskManager.findById(id);
 
-        if (foundTask == null) {
-            String errorResponse = "{\"error\":\"Task not found\"}";
-            exchange.sendResponseHeaders(404, errorResponse.getBytes().length);
+            if (foundTask == null) {
+                String errorResponse = "{\"error\":\"Task not found\"}";
+                exchange.sendResponseHeaders(404, errorResponse.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(errorResponse.getBytes());
+                os.close();
+                return;
+            }
+
+            switch (method) {
+                case "GET" -> {
+                    String response = gson.toJson(foundTask);
+                    exchange.sendResponseHeaders(200, response.getBytes().length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+
+                }
+                case "PUT" -> {
+                    InputStream is = exchange.getRequestBody();
+                    String requestBody = new String(is.readAllBytes());
+
+                    Task taskUpdates = gson.fromJson(requestBody, Task.class);
+
+                    if (taskUpdates.getTitle() != null) {
+                        foundTask.setTitle(taskUpdates.getTitle());
+                    }
+                    if (taskUpdates.getDescription() != null) {
+                        foundTask.setDescription(taskUpdates.getDescription());
+                    }
+                    if (taskUpdates.getPriority() != null) {
+                        foundTask.setPriority(taskUpdates.getPriority());
+                    }
+                    if (taskUpdates.getStatus() != null) {
+                        foundTask.setStatus(taskUpdates.getStatus());
+                    }
+
+                    taskManager.update(foundTask);
+                    
+                    String response = gson.toJson(foundTask);
+                    exchange.sendResponseHeaders(200, response.getBytes().length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+
+                }
+                case "DELETE" -> {
+                    taskManager.deleteTask(id);
+
+                    exchange.sendResponseHeaders(204, -1);
+                    exchange.close();
+                }
+                default -> {
+                    exchange.sendResponseHeaders(405, -1);
+                    exchange.close();
+                }
+            }
+        } catch (SQLException e) {
+            String errorResponse = "{\"error\":\"Database error\"}";
+            exchange.sendResponseHeaders(500, errorResponse.getBytes().length);
             OutputStream os = exchange.getResponseBody();
             os.write(errorResponse.getBytes());
             os.close();
-            return;
-        }
-
-        switch (method) {
-            case "GET" -> {
-                String response = gson.toJson(foundTask);
-                exchange.sendResponseHeaders(200, response.getBytes().length);
-                OutputStream os = exchange.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
-
-            }
-            case "PUT" -> {
-                InputStream is = exchange.getRequestBody();
-                String requestBody = new String(is.readAllBytes());
-
-                Task taskUpdates = gson.fromJson(requestBody, Task.class);
-
-                if (taskUpdates.getTitle() != null) {
-                    foundTask.setTitle(taskUpdates.getTitle());
-                }
-                if (taskUpdates.getDescription() != null) {
-                    foundTask.setDescription(taskUpdates.getDescription());
-                }
-                if (taskUpdates.getPriority() != null) {
-                    foundTask.setPriority(taskUpdates.getPriority());
-                }
-                if (taskUpdates.getStatus() != null) {
-                    foundTask.setStatus(taskUpdates.getStatus());
-                }
-
-                String response = gson.toJson(foundTask);
-                exchange.sendResponseHeaders(200, response.getBytes().length);
-                OutputStream os = exchange.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
-
-            }
-            case "DELETE" -> {
-                taskManager.deleteTask(foundTask);
-
-                exchange.sendResponseHeaders(204, -1);
-                exchange.close();
-            }
-            default -> {
-                exchange.sendResponseHeaders(405, -1);
-                exchange.close();
-            }
         }
     }
 }
