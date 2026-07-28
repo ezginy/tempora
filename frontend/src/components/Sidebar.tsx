@@ -1,13 +1,14 @@
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import { LayoutDashboard, BarChart3, Settings, Menu, X } from "lucide-react";
 
 function Sidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const menuItems = [
-    { label: "Board", icon: LayoutDashboard, active: true },
-    { label: "Analytics", icon: BarChart3, active: false },
-    { label: "Settings", icon: Settings, active: false },
+    { label: "Board", icon: LayoutDashboard, path: "/board" },
+    { label: "Analytics", icon: BarChart3, path: "/analytics" },
+    { label: "Settings", icon: Settings, path: "/settings" },
   ];
 
   return (
@@ -45,19 +46,19 @@ function Sidebar() {
           {menuItems.map((item, index) => {
             const Icon = item.icon;
             return (
-              <div
+              <NavLink
                 key={item.label}
-                className={`flex items-center gap-3 py-3 px-2 rounded-md ${
-                  index !== 0 ? "border-t border-surface-card mx-2" : ""
-                } ${
-                  item.active
-                    ? "text-accent bg-accent-muted"
-                    : "text-text-muted"
-                }`}
+                to={item.path}
+                onClick={() => setIsSidebarOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 py-3 px-2 mx-2 rounded-md ${
+                    index !== 0 ? "border-t border-surface-card" : ""
+                  } ${isActive ? "text-accent bg-accent-muted" : "text-text-muted"}`
+                }
               >
                 <Icon size={16} />
                 {item.label}
-              </div>
+              </NavLink>
             );
           })}
         </nav>
