@@ -43,7 +43,17 @@ public class TaskManager {
     // Returns the full list of tasks
     public List<Task> getAllTasks() throws SQLException {
         List<Task> taskList = new ArrayList<>();
-        String sql = "SELECT * FROM tasks";
+        String sql = """
+                SELECT tasks.*, latest_entry.changed_at AS last_entered_inprogress_at
+                FROM tasks
+                LEFT JOIN (
+                    SELECT DISTINCT ON (task_id) task_id, changed_at
+                    FROM status_history
+                    WHERE to_status = 'IN_PROGRESS'
+                    ORDER BY task_id, changed_at DESC
+                ) AS latest_entry
+                ON tasks.id = latest_entry.task_id
+                """;
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);
@@ -59,6 +69,7 @@ public class TaskManager {
                         rs.getObject("estimated_duration", Integer.class),
                         rs.getInt("actual_duration")
                 );
+                task.setLastEnteredInProgressAt(rs.getTimestamp("last_entered_inprogress_at"));
                 taskList.add(task);
             }
         }
