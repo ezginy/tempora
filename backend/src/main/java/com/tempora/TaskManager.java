@@ -66,6 +66,32 @@ public class TaskManager {
         return taskList;
     }
 
+    // Returns the full status change history for a task
+    public List<StatusChange> getHistory(int taskId) throws SQLException {
+        List<StatusChange> history = new ArrayList<>();
+        String sql = "SELECT from_status, to_status, changed_at FROM status_history WHERE task_id = ? ORDER BY changed_at";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, taskId);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    String fromStatus = rs.getString("from_status");
+                    StatusChange change = new StatusChange(
+                            fromStatus != null ? Status.valueOf(fromStatus) : null,
+                            Status.valueOf(rs.getString("to_status")),
+                            rs.getTimestamp("changed_at")
+                    );
+                    history.add(change);
+                }
+            }
+        }
+
+        return history;
+    }
+
     // Finds a task by its id, or returns null if no match is found
     public Task findById(int id) throws SQLException {
         String sql = "SELECT * FROM tasks WHERE id = ?";
