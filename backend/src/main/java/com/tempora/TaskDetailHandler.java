@@ -27,6 +27,8 @@ public class TaskDetailHandler implements HttpHandler {
         String[] parts = path.split("/");
         int id = Integer.parseInt(parts[2]);
 
+        boolean isHistoryRequest = parts.length > 3 && parts[3].equals("history");
+
         try {
             Task foundTask = taskManager.findById(id);
 
@@ -41,7 +43,12 @@ public class TaskDetailHandler implements HttpHandler {
 
             switch (method) {
                 case "GET" -> {
-                    String response = gson.toJson(foundTask);
+                    String response;
+                    if (isHistoryRequest) {
+                        response = gson.toJson(taskManager.getHistory(id));
+                    } else {
+                        response = gson.toJson(foundTask);
+                    }
                     exchange.sendResponseHeaders(200, response.getBytes().length);
                     OutputStream os = exchange.getResponseBody();
                     os.write(response.getBytes());
@@ -53,6 +60,7 @@ public class TaskDetailHandler implements HttpHandler {
                     String requestBody = new String(is.readAllBytes());
 
                     Task taskUpdates = gson.fromJson(requestBody, Task.class);
+                    Status oldStatus = foundTask.getStatus();
 
                     if (taskUpdates.getTitle() != null) {
                         foundTask.setTitle(taskUpdates.getTitle());
@@ -67,8 +75,8 @@ public class TaskDetailHandler implements HttpHandler {
                         foundTask.setStatus(taskUpdates.getStatus());
                     }
 
-                    taskManager.update(foundTask);
-                    
+                    taskManager.update(foundTask, oldStatus);
+
                     String response = gson.toJson(foundTask);
                     exchange.sendResponseHeaders(200, response.getBytes().length);
                     OutputStream os = exchange.getResponseBody();

@@ -1,5 +1,7 @@
 package com.tempora;
 
+import java.sql.Timestamp;
+
 public class Task {
     private int id;
     private String title;
@@ -8,6 +10,7 @@ public class Task {
     private Status status;
     private Integer estimatedDuration;
     private int actualDuration;
+    private Timestamp lastEnteredInProgressAt;
 
     // Original constructor, still used when duration info isn't relevant yet (defaults to null/0)
     public Task(int id, String title, String description, Priority priority, Status status) {
@@ -80,6 +83,14 @@ public class Task {
 
     public void setActualDuration(int actualDuration) {
         this.actualDuration = actualDuration;
+    }
+
+    public Timestamp getLastEnteredInProgressAt() {
+        return lastEnteredInProgressAt;
+    }
+
+    public void setLastEnteredInProgressAt(Timestamp lastEnteredInProgressAt) {
+        this.lastEnteredInProgressAt = lastEnteredInProgressAt;
     }
 
     // Checks whether this task has the minimum required data (a non-blank title)
