@@ -1,12 +1,8 @@
 package com.tempora;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class TaskManager {
 
@@ -98,7 +94,12 @@ public class TaskManager {
 
     // Updates an existing task in the database
     public void update(Task task, Status oldStatus) throws SQLException {
-        String sql = "UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, estimated_duration = ? WHERE id = ?";
+        if (oldStatus == Status.IN_PROGRESS && task.getStatus() != Status.IN_PROGRESS) {
+            int secondsSpent = calculateSecondsSinceLastEntry(task.getId());
+            task.setActualDuration(task.getActualDuration() + secondsSpent);
+        }
+
+        String sql = "UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, estimated_duration = ?, actual_duration = ? WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -108,7 +109,8 @@ public class TaskManager {
             statement.setString(3, task.getPriority().toString());
             statement.setString(4, task.getStatus().toString());
             statement.setObject(5, task.getEstimatedDuration());
-            statement.setInt(6, task.getId());
+            statement.setInt(6, task.getActualDuration());
+            statement.setInt(7, task.getId());
 
             statement.executeUpdate();
 
@@ -131,5 +133,24 @@ public class TaskManager {
 
             statement.executeUpdate();
         }
+    }
+
+    private int calculateSecondsSinceLastEntry(int taskId) throws SQLException {
+        String sql = "SELECT changed_at FROM status_history WHERE task_id = ? AND to_status = 'IN_PROGRESS' ORDER BY changed_at DESC LIMIT 1";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, taskId);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    Timestamp enteredAt = rs.getTimestamp("changed_at");
+                    long millisElapsed = System.currentTimeMillis() - enteredAt.getTime();
+                    return (int) (millisElapsed / 1000);
+                }
+            }
+        }
+        return 0;
     }
 }
