@@ -9,3 +9,13 @@ CREATE TABLE IF NOT EXISTS tasks
     estimated_duration INTEGER,
     actual_duration    INTEGER                                                       DEFAULT 0      NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS status_history
+(
+    id          SERIAL PRIMARY KEY,
+    task_id     INTEGER REFERENCES tasks (id) ON DELETE CASCADE                   NOT NULL,
+    from_status VARCHAR(15) CHECK ( from_status IN ('TODO', 'IN_PROGRESS', 'DONE') ),
+    to_status   VARCHAR(15) CHECK ( to_status IN ('TODO', 'IN_PROGRESS', 'DONE')) NOT NULL,
+    changed_at  TIMESTAMPTZ DEFAULT now()                                         NOT NULL
+
+);
