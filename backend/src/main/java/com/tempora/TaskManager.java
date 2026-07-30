@@ -26,6 +26,7 @@ public class TaskManager {
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
                     task.setId(rs.getInt("id"));
+                    recordStatusChange(task.getId(), null, task.getStatus());
                 }
             }
         }
@@ -108,6 +109,21 @@ public class TaskManager {
             statement.setString(4, task.getStatus().toString());
             statement.setObject(5, task.getEstimatedDuration());
             statement.setInt(6, task.getId());
+
+            statement.executeUpdate();
+        }
+    }
+
+    // Records a status change in status_history
+    private void recordStatusChange(int taskId, Status fromStatus, Status toStatus) throws SQLException {
+        String sql = "INSERT INTO status_history (task_id, from_status, to_status) VALUES (?, ?, ?)";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, taskId);
+            statement.setString(2, fromStatus != null ? fromStatus.toString() : null);
+            statement.setString(3, toStatus.toString());
 
             statement.executeUpdate();
         }
