@@ -97,7 +97,7 @@ public class TaskManager {
     }
 
     // Updates an existing task in the database
-    public void update(Task task) throws SQLException {
+    public void update(Task task, Status oldStatus) throws SQLException {
         String sql = "UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, estimated_duration = ? WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
@@ -111,6 +111,10 @@ public class TaskManager {
             statement.setInt(6, task.getId());
 
             statement.executeUpdate();
+
+            if (oldStatus != task.getStatus()) {
+                recordStatusChange(task.getId(), oldStatus, task.getStatus());
+            }
         }
     }
 

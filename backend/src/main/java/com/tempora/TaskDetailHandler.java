@@ -53,6 +53,7 @@ public class TaskDetailHandler implements HttpHandler {
                     String requestBody = new String(is.readAllBytes());
 
                     Task taskUpdates = gson.fromJson(requestBody, Task.class);
+                    Status oldStatus = foundTask.getStatus();
 
                     if (taskUpdates.getTitle() != null) {
                         foundTask.setTitle(taskUpdates.getTitle());
@@ -67,8 +68,8 @@ public class TaskDetailHandler implements HttpHandler {
                         foundTask.setStatus(taskUpdates.getStatus());
                     }
 
-                    taskManager.update(foundTask);
-                    
+                    taskManager.update(foundTask, oldStatus);
+
                     String response = gson.toJson(foundTask);
                     exchange.sendResponseHeaders(200, response.getBytes().length);
                     OutputStream os = exchange.getResponseBody();
