@@ -6,13 +6,24 @@ public class Task {
     private String description;
     private Priority priority;
     private Status status;
+    private Integer estimatedDuration;
+    private int actualDuration;
 
+    // Original constructor, still used when duration info isn't relevant yet (defaults to null/0)
     public Task(int id, String title, String description, Priority priority, Status status) {
+        this(id, title, description, priority, status, null, 0);
+    }
+
+    // Full constructor, used when reading a row back from the database
+    public Task(int id, String title, String description, Priority priority, Status status,
+                Integer estimatedDuration, int actualDuration) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.priority = priority;
         this.status = status;
+        this.estimatedDuration = estimatedDuration;
+        this.actualDuration = actualDuration;
     }
 
     public int getId() {
@@ -53,6 +64,22 @@ public class Task {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Integer getEstimatedDuration() {
+        return estimatedDuration;
+    }
+
+    public void setEstimatedDuration(Integer estimatedDuration) {
+        this.estimatedDuration = estimatedDuration;
+    }
+
+    public int getActualDuration() {
+        return actualDuration;
+    }
+
+    public void setActualDuration(int actualDuration) {
+        this.actualDuration = actualDuration;
     }
 
     // Checks whether this task has the minimum required data (a non-blank title)
