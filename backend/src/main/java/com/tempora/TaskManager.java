@@ -12,7 +12,7 @@ public class TaskManager {
 
     // Adds a new task to the database
     public void addTask(Task task) throws SQLException {
-        String sql = "INSERT INTO tasks (title, description, priority, status) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO tasks (title, description, priority, status, estimated_duration) VALUES (?, ?, ?, ?, ?) RETURNING id";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -21,8 +21,13 @@ public class TaskManager {
             statement.setString(2, task.getDescription());
             statement.setString(3, task.getPriority().toString());
             statement.setString(4, task.getStatus().toString());
+            statement.setObject(5, task.getEstimatedDuration());
 
-            statement.executeUpdate();
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    task.setId(rs.getInt("id"));
+                }
+            }
         }
     }
 
@@ -53,7 +58,9 @@ public class TaskManager {
                         rs.getString("title"),
                         rs.getString("description"),
                         Priority.valueOf(rs.getString("priority")),
-                        Status.valueOf(rs.getString("status"))
+                        Status.valueOf(rs.getString("status")),
+                        rs.getObject("estimated_duration", Integer.class),
+                        rs.getInt("actual_duration")
                 );
                 taskList.add(task);
             }
@@ -78,7 +85,9 @@ public class TaskManager {
                             rs.getString("title"),
                             rs.getString("description"),
                             Priority.valueOf(rs.getString("priority")),
-                            Status.valueOf(rs.getString("status"))
+                            Status.valueOf(rs.getString("status")),
+                            rs.getObject("estimated_duration", Integer.class),
+                            rs.getInt("actual_duration")
                     );
                 }
             }
@@ -88,7 +97,7 @@ public class TaskManager {
 
     // Updates an existing task in the database
     public void update(Task task) throws SQLException {
-        String sql = "UPDATE tasks SET title = ?, description = ?, priority = ?, status = ? WHERE id = ?";
+        String sql = "UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, estimated_duration = ? WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -97,7 +106,8 @@ public class TaskManager {
             statement.setString(2, task.getDescription());
             statement.setString(3, task.getPriority().toString());
             statement.setString(4, task.getStatus().toString());
-            statement.setInt(5, task.getId());
+            statement.setObject(5, task.getEstimatedDuration());
+            statement.setInt(6, task.getId());
 
             statement.executeUpdate();
         }
