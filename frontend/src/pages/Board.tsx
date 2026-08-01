@@ -8,6 +8,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
+import { Plus, Pencil } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,10 +19,14 @@ function Board() {
 
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [titleError, setTitleError] = useState(false);
+
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [newPriority, setNewPriority] = useState<Priority>("LOW");
-  const [titleError, setTitleError] = useState(false);
+  const [newEstimatedDays, setNewEstimatedDays] = useState("");
+  const [newEstimatedHours, setNewEstimatedHours] = useState("");
+  const [newEstimatedMinutes, setNewEstimatedMinutes] = useState("");
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -58,10 +63,16 @@ function Board() {
     }
     setTitleError(false);
 
+    const days = parseInt(newEstimatedDays) || 0;
+    const hours = parseInt(newEstimatedHours) || 0;
+    const minutes = parseInt(newEstimatedMinutes) || 0;
+    const totalSeconds = (days * 24 * 60 + hours * 60 + minutes) * 60;
+
     const taskData = {
       title: newTitle,
       description: newDescription,
       priority: newPriority,
+      estimatedDuration: totalSeconds > 0 ? totalSeconds : null,
     };
 
     if (editingTaskId) {
@@ -114,6 +125,9 @@ function Board() {
     setNewTitle("");
     setNewDescription("");
     setNewPriority("LOW");
+    setNewEstimatedDays("");
+    setNewEstimatedHours("");
+    setNewEstimatedMinutes("");
     setTitleError(false);
     setEditingTaskId(null);
   };
@@ -168,8 +182,15 @@ function Board() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-surface-card p-8 rounded-lg flex flex-col gap-4 min-w-80">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-surface-card p-8 rounded-lg flex flex-col gap-4 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div
+              className={`flex items-center justify-center gap-2 text-md font-semibold mb-2
+              ${editingTaskId ? "text-priority-medium" : "text-accent"}`}
+            >
+              {editingTaskId ? <Pencil size={16} /> : <Plus size={16} />}
+              <span>{editingTaskId ? "Edit Task" : "Create Task"}</span>
+            </div>
             <input
               type="text"
               placeholder="Title"
@@ -197,6 +218,36 @@ function Board() {
               <option value="HIGH">High</option>
             </select>
 
+            <p className="text-xs text-text-muted -mb-2 mt-2">
+              Estimated duration (optional)
+            </p>
+            <div className="flex gap-3">
+              <input
+                type="number"
+                min={0}
+                placeholder="Days"
+                value={newEstimatedDays}
+                onChange={(e) => setNewEstimatedDays(e.target.value)}
+                className="p-2 rounded-md bg-surface-card-title text-text-primary w-1/3"
+              />
+              <input
+                type="number"
+                min={0}
+                placeholder="Hours"
+                value={newEstimatedHours}
+                onChange={(e) => setNewEstimatedHours(e.target.value)}
+                className="p-2 rounded-md bg-surface-card-title text-text-primary w-1/3"
+              />
+              <input
+                type="number"
+                min={0}
+                placeholder="Minutes"
+                value={newEstimatedMinutes}
+                onChange={(e) => setNewEstimatedMinutes(e.target.value)}
+                className="p-2 rounded-md bg-surface-card-title text-text-primary w-1/3"
+              />
+            </div>
+
             <div className="flex justify-between mt-2">
               <button
                 onClick={() => {
@@ -209,7 +260,8 @@ function Board() {
               </button>
               <button
                 onClick={handleSubmitTask}
-                className="px-3 py-2 rounded-md bg-priority-low text-surface-page font-semibold hover:opacity-80 transition-opacity"
+                className={`px-3 py-2 rounded-md text-surface-page font-semibold hover:opacity-80 transition-opacity 
+                  ${editingTaskId ? "bg-priority-medium" : "bg-accent"}`}
               >
                 {editingTaskId ? "Save" : "Add Task"}
               </button>

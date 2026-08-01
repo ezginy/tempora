@@ -3,6 +3,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import type { Priority, Task } from "../types/Task";
 import { Trash2, Pencil, MoreHorizontal } from "lucide-react";
+import { formatDuration } from "../utils/formatDuration";
 
 type TaskCardProps = {
   task: Task;
@@ -26,7 +27,29 @@ function TaskCard(props: TaskCardProps) {
     });
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (
+      props.task.status !== "IN_PROGRESS" ||
+      !props.task.lastEnteredInProgressAt
+    ) {
+      return;
+    }
+
+    const startTime = new Date(props.task.lastEnteredInProgressAt).getTime();
+
+    const updateElapsed = () => {
+      const now = Date.now();
+      setElapsedSeconds(Math.floor((now - startTime) / 1000));
+    };
+
+    updateElapsed();
+    const intervalId = setInterval(updateElapsed, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [props.task.status, props.task.lastEnteredInProgressAt]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -115,9 +138,18 @@ function TaskCard(props: TaskCardProps) {
         )}
       </div>
 
-      <div className="w-full mt-1 text-left">
+      <div className="w-full mt-1 flex justify-between items-center">
         <span className="text-[10px] text-text-muted/40 font-mono font-medium">
           #{props.task.id}
+        </span>
+        <span className="text-[12px] text-text-muted">
+          {props.task.status === "TODO" && props.task.estimatedDuration != null
+            ? `≈ ${formatDuration(props.task.estimatedDuration)}`
+            : props.task.status === "IN_PROGRESS"
+              ? `> ${formatDuration(elapsedSeconds)}`
+              : props.task.status === "DONE"
+                ? `: ${formatDuration(props.task.actualDuration)}`
+                : null}
         </span>
       </div>
     </div>
