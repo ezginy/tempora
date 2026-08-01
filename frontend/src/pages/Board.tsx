@@ -75,34 +75,42 @@ function Board() {
       estimatedDuration: totalSeconds > 0 ? totalSeconds : null,
     };
 
-    if (editingTaskId) {
-      // edit mod: PUT request
-      const response = await fetch(`${API_URL}/tasks/${editingTaskId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(taskData),
-      });
-      const updatedTask = await response.json();
+    try {
+      if (editingTaskId) {
+        // edit mod: PUT request
+        const response = await fetch(`${API_URL}/tasks/${editingTaskId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(taskData),
+        });
+        if (!response.ok) throw new Error(`PUT failed: ${response.status}`);
 
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === editingTaskId ? updatedTask : task
-        )
-      );
-    } else {
-      // create mod: POST request
-      const response = await fetch(`${API_URL}/tasks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(taskData),
-      });
-      const createdTask = await response.json();
+        const updatedTask = await response.json();
 
-      setTasks((prevTasks) => [...prevTasks, createdTask]);
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === editingTaskId ? updatedTask : task
+          )
+        );
+      } else {
+        // create mod: POST request
+        const response = await fetch(`${API_URL}/tasks`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(taskData),
+        });
+        if (!response.ok) throw new Error(`POST failed: ${response.status}`);
+
+        const createdTask = await response.json();
+
+        setTasks((prevTasks) => [...prevTasks, createdTask]);
+      }
+
+      setIsModalOpen(false);
+      resetForm();
+    } catch (err) {
+      console.log("Failed to submit task: ", err);
     }
-
-    setIsModalOpen(false);
-    resetForm();
   };
 
   const handleDeleteTask = async (id: number) => {
