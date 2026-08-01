@@ -3,6 +3,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import type { Priority, Task } from "../types/Task";
 import { Trash2, Pencil, MoreHorizontal } from "lucide-react";
+import { formatDuration } from "../utils/formatDuration";
 
 type TaskCardProps = {
   task: Task;
@@ -17,19 +18,6 @@ const priorityStyles = (p: Priority): string => {
     return "border border-priority-medium/20 text-priority-medium bg-priority-medium/10";
   else
     return "border border-priority-low/20 text-priority-low bg-priority-low/10";
-};
-
-const formatDuration = (seconds: number): string => {
-  const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-
-  const parts: string[] = [];
-  if (days > 0) parts.push(`${days}d`);
-  if (hours > 0) parts.push(`${hours}h`);
-  if (minutes > 0 || parts.length === 0) parts.push(`${minutes}m`);
-
-  return parts.join(" ");
 };
 
 function TaskCard(props: TaskCardProps) {
