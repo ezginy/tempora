@@ -22,9 +22,14 @@ const priorityStyles = (p: Priority): string => {
 const formatDuration = (seconds: number): string => {
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
 
-  if (days > 0) return `${days}d ${hours}h`;
-  return `${hours}h`;
+  const parts: string[] = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0 || parts.length === 0) parts.push(`${minutes}m`);
+
+  return parts.join(" ");
 };
 
 function TaskCard(props: TaskCardProps) {
@@ -34,7 +39,29 @@ function TaskCard(props: TaskCardProps) {
     });
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (
+      props.task.status !== "IN_PROGRESS" ||
+      !props.task.lastEnteredInProgressAt
+    ) {
+      return;
+    }
+
+    const startTime = new Date(props.task.lastEnteredInProgressAt).getTime();
+
+    const updateElapsed = () => {
+      const now = Date.now();
+      setElapsedSeconds(Math.floor((now - startTime) / 1000));
+    };
+
+    updateElapsed();
+    const intervalId = setInterval(updateElapsed, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [props.task.status, props.task.lastEnteredInProgressAt]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -130,9 +157,11 @@ function TaskCard(props: TaskCardProps) {
         <span className="text-[12px] text-text-muted">
           {props.task.status === "TODO" && props.task.estimatedDuration != null
             ? `≈ ${formatDuration(props.task.estimatedDuration)}`
-            : props.task.status === "DONE"
-              ? formatDuration(props.task.actualDuration)
-              : null}
+            : props.task.status === "IN_PROGRESS"
+              ? `> ${formatDuration(elapsedSeconds)}`
+              : props.task.status === "DONE"
+                ? `: ${formatDuration(props.task.actualDuration)}`
+                : null}
         </span>
       </div>
     </div>
