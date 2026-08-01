@@ -21,6 +21,8 @@ function Board() {
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [newPriority, setNewPriority] = useState<Priority>("LOW");
+  const [newEstimatedDays, setNewEstimatedDays] = useState("");
+  const [newEstimatedHours, setNewEstimatedHours] = useState("");
   const [titleError, setTitleError] = useState(false);
 
   useEffect(() => {
@@ -58,10 +60,15 @@ function Board() {
     }
     setTitleError(false);
 
+    const days = parseInt(newEstimatedDays) || 0;
+    const hours = parseInt(newEstimatedHours) || 0;
+    const totalSeconds = (days * 24 + hours) * 3600;
+
     const taskData = {
       title: newTitle,
       description: newDescription,
       priority: newPriority,
+      estimatedDuration: totalSeconds > 0 ? totalSeconds : null,
     };
 
     if (editingTaskId) {
@@ -114,6 +121,8 @@ function Board() {
     setNewTitle("");
     setNewDescription("");
     setNewPriority("LOW");
+    setNewEstimatedDays("");
+    setNewEstimatedHours("");
     setTitleError(false);
     setEditingTaskId(null);
   };
@@ -196,6 +205,25 @@ function Board() {
               <option value="MEDIUM">Medium</option>
               <option value="HIGH">High</option>
             </select>
+
+            <div className="flex gap-3">
+              <input
+                type="number"
+                min={0}
+                placeholder="Days (optional)"
+                value={newEstimatedDays}
+                onChange={(e) => setNewEstimatedDays(e.target.value)}
+                className="p-2 rounded-md bg-surface-card-title text-text-primary w-1/2"
+              />
+              <input
+                type="number"
+                min={0}
+                placeholder="Hours (optional)"
+                value={newEstimatedHours}
+                onChange={(e) => setNewEstimatedHours(e.target.value)}
+                className="p-2 rounded-md bg-surface-card-title text-text-primary w-1/2"
+              />
+            </div>
 
             <div className="flex justify-between mt-2">
               <button

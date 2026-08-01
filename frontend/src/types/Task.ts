@@ -8,4 +8,7 @@ export type Task = {
   description: string;
   priority: Priority;
   status: Status;
+  estimatedDuration: number | null;
+  actualDuration: number;
+  lastEnteredInProgressAt: string | null;
 };

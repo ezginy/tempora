@@ -19,6 +19,14 @@ const priorityStyles = (p: Priority): string => {
     return "border border-priority-low/20 text-priority-low bg-priority-low/10";
 };
 
+const formatDuration = (seconds: number): string => {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+
+  if (days > 0) return `${days}d ${hours}h`;
+  return `${hours}h`;
+};
+
 function TaskCard(props: TaskCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -115,9 +123,16 @@ function TaskCard(props: TaskCardProps) {
         )}
       </div>
 
-      <div className="w-full mt-1 text-left">
+      <div className="w-full mt-1 flex justify-between items-center">
         <span className="text-[10px] text-text-muted/40 font-mono font-medium">
           #{props.task.id}
+        </span>
+        <span className="text-[12px] text-text-muted">
+          {props.task.status === "TODO" && props.task.estimatedDuration != null
+            ? `≈ ${formatDuration(props.task.estimatedDuration)}`
+            : props.task.status === "DONE"
+              ? formatDuration(props.task.actualDuration)
+              : null}
         </span>
       </div>
     </div>
