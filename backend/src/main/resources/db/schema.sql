@@ -10,6 +10,11 @@ CREATE TABLE IF NOT EXISTS tasks
     actual_duration    INTEGER                                                       DEFAULT 0      NOT NULL
 );
 
+ALTER TABLE tasks
+    ADD COLUMN IF NOT EXISTS estimated_duration INTEGER;
+ALTER TABLE tasks
+    ADD COLUMN IF NOT EXISTS actual_duration INTEGER NOT NULL DEFAULT 0;
+
 CREATE TABLE IF NOT EXISTS status_history
 (
     id          SERIAL PRIMARY KEY,
