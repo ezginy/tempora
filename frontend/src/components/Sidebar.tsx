@@ -9,7 +9,6 @@ import {
   User,
   Bell,
   HelpCircle,
-  icons,
 } from "lucide-react";
 import TemporaIcon from "./TemporaIcon";
 
@@ -26,11 +25,11 @@ function Sidebar() {
   const menuItems = [
     { label: "Board", icon: LayoutDashboard, path: "/board" },
     { label: "Analytics", icon: BarChart3, path: "/analytics" },
-    { label: "Settings", icon: Settings, path: "/settings" },
+    { label: "Notifications", icon: Settings, path: "/notifications" },
   ];
   const bottomItems = [
-    { label: "Help", icon: HelpCircle },
-    { label: "Notifications", icon: Bell },
+    { label: "Help", icon: HelpCircle, path: "/help" },
+    { label: "Settings", icon: Bell, path: "/settings" },
   ];
 
   useEffect(() => {
@@ -142,9 +141,15 @@ function Sidebar() {
           {bottomItems.map((item) => {
             const Icon = item.icon;
             return (
-              <div
+              <NavLink
                 key={item.label}
-                className="group relative flex items-center gap-3 p-2 mx-2 rounded-md text-text-muted"
+                to={item.path}
+                onClick={() => setIsSidebarOpen(false)}
+                className={({ isActive }) =>
+                  `group relative flex items-center gap-3 p-2 mx-2 rounded-md ${
+                    isActive ? "text-accent bg-accent-muted" : "text-text-muted"
+                  }`
+                }
               >
                 <Icon size={16} />
                 {!showCollapsed && (
@@ -155,7 +160,7 @@ function Sidebar() {
                     {item.label}
                   </span>
                 )}
-              </div>
+              </NavLink>
             );
           })}
 
