@@ -28,7 +28,12 @@ function Analytics() {
     fetchTasks();
   }, []);
 
-  if (isLoading) return <p className="p-4 text-text-primary">Loading...</p>;
+  if (isLoading)
+    return (
+      <p className="p-4 text-text-primary bg-surface-page min-h-screen">
+        Loading...
+      </p>
+    );
 
   const chartData = tasks.map((task) => ({
     name: task.title,
