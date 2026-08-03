@@ -15,6 +15,9 @@ function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem("sidebarCollapsed") === "true";
   });
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+
+  const showCollapsed = isCollapsed && isDesktop;
 
   const menuItems = [
     { label: "Board", icon: LayoutDashboard, path: "/board" },
@@ -25,6 +28,12 @@ function Sidebar() {
   useEffect(() => {
     localStorage.setItem("sidebarCollapsed", String(isCollapsed));
   }, [isCollapsed]);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <>
@@ -44,7 +53,7 @@ function Sidebar() {
 
       <div
         className={`w-56 min-h-screen bg-surface-sidebar border-r border-surface-column p-4 flex flex-col fixed md:static top-0 left-0 z-40 transition-all duration-300 ease-in-out   
-          ${isCollapsed ? "md:w-20" : "md:w-56"}
+          ${showCollapsed ? "md:w-20" : "md:w-56"}
           ${
             isSidebarOpen
               ? "translate-x-0"
@@ -52,7 +61,7 @@ function Sidebar() {
           }`}
       >
         <div className="flex justify-between items-center mb-8">
-          {isCollapsed ? (
+          {showCollapsed ? (
             <div className="w-full flex justify-center">
               <button
                 onClick={() => setIsCollapsed(false)}
@@ -104,7 +113,7 @@ function Sidebar() {
                 }
               >
                 <Icon size={16} />
-                {!isCollapsed && item.label}
+                {!showCollapsed && item.label}
               </NavLink>
             );
           })}
