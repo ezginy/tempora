@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Board from "./pages/Board";
@@ -11,6 +12,11 @@ import "./App.css";
 function App() {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    document.documentElement.classList.toggle("light", savedTheme === "light");
+  }, []);
 
   return (
     <div className="flex bg-surface-page">
