@@ -7,6 +7,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  LabelList,
 } from "recharts";
 import type { Task } from "../types/Task";
 import { formatDuration } from "../utils/formatDuration";
@@ -37,14 +38,13 @@ function Analytics() {
     Actual: Math.round(task.actualDuration / 60),
   }));
 
-  const overrunTasks = tasks
+  const durationComparisons = tasks
     .filter((task) => task.estimatedDuration !== null)
     .map((task) => ({
       ...task,
-      overrunSeconds: task.actualDuration - task.estimatedDuration!,
+      diffSeconds: task.actualDuration - task.estimatedDuration!,
     }))
-    .filter((task) => task.overrunSeconds > 0)
-    .sort((a, b) => b.overrunSeconds - a.overrunSeconds);
+    .sort((a, b) => Math.abs(b.diffSeconds) - Math.abs(a.diffSeconds));
 
   return (
     <div className="p-4 text-text-primary bg-surface-page flex flex-col flex-1 h-screen">
@@ -58,7 +58,7 @@ function Analytics() {
           <YAxis
             stroke="#9a9aa5"
             label={{
-              value: "minutes",
+              value: "Minutes",
               angle: -90,
               position: "insideLeft",
               fill: "#9a9aa5",
@@ -66,10 +66,31 @@ function Analytics() {
           />
           <Tooltip
             contentStyle={{ backgroundColor: "#202028", border: "none" }}
+            cursor={{ fill: "rgba(255, 255, 255, 0.03" }}
           />
           <Legend />
-          <Bar dataKey="Estimated" fill="#38bdf8" />
-          <Bar dataKey="Actual" fill="#34d399" />
+          <Bar dataKey="Estimated" fill="#38bdf8">
+            <LabelList
+              dataKey="Estimated"
+              position="top"
+              fill="#9a9aa5"
+              fontSize={11}
+              formatter={(value) =>
+                typeof value === "number" ? formatDuration(value * 60) : ""
+              }
+            />
+          </Bar>
+          <Bar dataKey="Actual" fill="#34d399">
+            <LabelList
+              dataKey="Actual"
+              position="top"
+              fill="#9a9aa5"
+              fontSize={11}
+              formatter={(value) =>
+                typeof value === "number" ? formatDuration(value * 60) : ""
+              }
+            />
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
 
@@ -77,23 +98,31 @@ function Analytics() {
         <h2 className="text-lg font-semibold mb-3">
           Tasks that ran over estimate
         </h2>
-        {overrunTasks.length === 0 ? (
+        {durationComparisons.length === 0 ? (
           <p className="text-text-muted text-sm">
             No tasks exceeded their estimate.
           </p>
         ) : (
           <ul className="flex flex-col gap-2">
-            {overrunTasks.map((task) => (
-              <li
-                key={task.id}
-                className="p-3 rounded-md bg-surface-column flex justify-between"
-              >
-                <span>{task.title}</span>
-                <span className="text-priority-high">
-                  +{formatDuration(task.overrunSeconds)}
-                </span>
-              </li>
-            ))}
+            {durationComparisons.map((task) => {
+              const isOver = task.diffSeconds > 0;
+              return (
+                <li
+                  key={task.id}
+                  className="p-3 rounded-md bg-surface-column flex justify-between"
+                >
+                  <span>{task.title}</span>
+                  <span
+                    className={
+                      isOver ? "text-priority-high" : "text-priority-low"
+                    }
+                  >
+                    {isOver ? "+" : "-"}
+                    {formatDuration(Math.abs(task.diffSeconds))}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>

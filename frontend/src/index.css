@@ -25,3 +25,8 @@ body {
   --color-priority-medium: #fbbf24;
   --color-priority-high: #ef4444;
 }
+
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}
