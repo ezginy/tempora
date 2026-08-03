@@ -6,6 +6,10 @@ import {
   Settings,
   Menu,
   PanelLeft,
+  User,
+  Bell,
+  HelpCircle,
+  icons,
 } from "lucide-react";
 import TemporaIcon from "./TemporaIcon";
 
@@ -23,6 +27,10 @@ function Sidebar() {
     { label: "Board", icon: LayoutDashboard, path: "/board" },
     { label: "Analytics", icon: BarChart3, path: "/analytics" },
     { label: "Settings", icon: Settings, path: "/settings" },
+  ];
+  const bottomItems = [
+    { label: "Help", icon: HelpCircle },
+    { label: "Notifications", icon: Bell },
   ];
 
   useEffect(() => {
@@ -62,7 +70,7 @@ function Sidebar() {
       >
         <div className="flex justify-between items-center mb-8">
           {showCollapsed ? (
-            <div className="w-full flex justify-center">
+            <div className="group relative w-full flex justify-center">
               <button
                 onClick={() => setIsCollapsed(false)}
                 onMouseEnter={() => setIsLogoHovered(true)}
@@ -78,6 +86,9 @@ function Sidebar() {
                   <TemporaIcon />
                 )}
               </button>
+              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-surface-column text-text-primary text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                Expand sidebar
+              </span>
             </div>
           ) : (
             <>
@@ -90,9 +101,12 @@ function Sidebar() {
                   setIsCollapsed(true);
                   setIsSidebarOpen(false);
                 }}
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-column text-text-muted hover:text-text-primary hover:bg-surface-card transition-colors"
+                className="group relative flex items-center justify-center w-8 h-8 rounded-full bg-surface-column text-text-muted hover:text-text-primary hover:bg-surface-card transition-colors"
               >
                 <PanelLeft size={16} />
+                <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2 py-1 rounded-md bg-surface-column text-text-primary text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                  Collapse sidebar
+                </span>
               </button>
             </>
           )}
@@ -107,17 +121,54 @@ function Sidebar() {
                 to={item.path}
                 onClick={() => setIsSidebarOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 py-3 px-2 mx-2 rounded-md ${
+                  `group relative flex items-center gap-3 py-3 px-2 mx-2 rounded-md ${
                     index !== 0 ? "border-t border-surface-card" : ""
                   } ${isActive ? "text-accent bg-accent-muted" : "text-text-muted"}`
                 }
               >
                 <Icon size={16} />
                 {!showCollapsed && item.label}
+                {showCollapsed && (
+                  <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-surface-column text-text-primary text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    {item.label}
+                  </span>
+                )}
               </NavLink>
             );
           })}
         </nav>
+
+        <div className="mt-auto flex flex-col gap-1">
+          {bottomItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.label}
+                className="group relative flex items-center gap-3 p-2 mx-2 rounded-md text-text-muted"
+              >
+                <Icon size={16} />
+                {!showCollapsed && (
+                  <span className="text-sm">{item.label}</span>
+                )}
+                {showCollapsed && (
+                  <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-surface-column text-text-primary text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    {item.label}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+
+          <div
+            className={`flex items-center gap-3 py-3 px-2 mx-2 rounded-md text-text-muted border-t border-surface-card mt-1 pt-4
+            ${showCollapsed ? "justify-center" : ""}`}
+          >
+            <div className="w-6 h-6 rounded-full bg-surface-column flex items-center justify-center shrink-0">
+              <User size={14} />
+            </div>
+            {!showCollapsed && <span className="text-sm">Account</span>}
+          </div>
+        </div>
       </div>
     </>
   );
