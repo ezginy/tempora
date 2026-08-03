@@ -36,6 +36,7 @@ function Board() {
         setTasks(data);
       } catch (e) {
         setError("Failed to load tasks. Please try again.");
+        console.error("Failed to fetch tasks: ", e);
       } finally {
         setIsLoading(false);
       }
@@ -156,7 +157,9 @@ function Board() {
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="p-4 flex flex-col gap-6 bg-surface-page min-h-screen flex-1 overflow-x-hidden">
+      <div className="p-4 flex flex-col gap-6 text-text-primary bg-surface-page min-h-screen flex-1 overflow-x-hidden">
+        <h1 className="text-2xl font-bold -mb-4 text-center">Board</h1>
+
         {isLoading && <p className="text-text-primary">Loading tasks...</p>}
         {error && <p className="text-priority-high">{error}</p>}
 
