@@ -1,8 +1,43 @@
+import { useState } from "react";
+import { Sun, Moon } from "lucide-react";
+
 function Settings() {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
   return (
-    <div className="p-4 text-text-primary bg-surface-page flex flex-col justify-center flex-1 h-screen">
-      <h1 className="text-2xl font-bold">Settings</h1>
-      <p className="text-text-muted mt-2">Coming soon.</p>
+    <div className="p-4 md:p-8 mx-auto flex flex-col flex-1 h-screen md:max-w-3xl text-text-primary bg-surface-page">
+      <h1 className="text-2xl font-bold mb-8 text-center">Settings</h1>
+
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold mb-3">Appearance</h2>
+        <div className="flex items-center justify-between p-4 rounded-lg bg-surface-card">
+          <div>
+            <p className="font-medium">Theme</p>
+            <p className="text-sm text-text-muted">Choose light or dark mode</p>
+          </div>
+          <button
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-surface-column text-text-primary"
+          >
+            {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+            {isDarkMode ? "Light" : "Dark"}
+          </button>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-lg font-semibold mb-3">Board Preferences</h2>
+        <div className="flex flex-col gap-3">
+          <div className="p-4 rounded-lg bg-surface-card">
+            <p className="font-medium">Confirm before delete</p>
+            <p className="text-sm text-text-muted">Coming soon.</p>
+          </div>
+          <div className="p-4 rounded-lg bg-surface-card">
+            <p className="font-medium">Default view</p>
+            <p className="text-sm text-text-muted">Coming soon.</p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
