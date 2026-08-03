@@ -26,6 +26,19 @@ body {
   --color-priority-high: #ef4444;
 }
 
+.light {
+  --color-surface-page: #f5f5f7;
+  --color-surface-sidebar: #ffffff;
+  --color-surface-column: #eaeaec;
+  --color-surface-card: #ffffff;
+  --color-surface-card-title: #f0f0f2;
+  --color-surface-card-desc: #f5f5f7;
+  --color-surface-card-badge: #e5e5e8;
+  --color-text-primary: #18181b;
+  --color-text-muted: #6b6b73;
+}
+
+
 .recharts-wrapper:focus,
 .recharts-surface:focus {
   outline: none;

@@ -59,7 +59,7 @@ function Sidebar() {
       )}
 
       <div
-        className={`w-56 h-screen overflow-y-auto bg-surface-sidebar border-r border-surface-column p-4 flex flex-col fixed md:static top-0 left-0 z-40 transition-all duration-300 ease-in-out   
+        className={`w-56 h-dvh overflow-y-auto bg-surface-sidebar border-r border-surface-column p-4 flex flex-col fixed md:static top-0 left-0 z-40 transition-all duration-300 ease-in-out   
           ${showCollapsed ? "md:w-20" : "md:w-56"}
           ${
             isSidebarOpen
