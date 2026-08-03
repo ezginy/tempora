@@ -47,13 +47,19 @@ function Board() {
   const handleDragEnd = (event: DragEndEvent) => {
     if (!event.over) return;
 
+    const newStatus = event.over.id as Status;
+
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
-        task.id === event.active.id
-          ? { ...task, status: event.over!.id as Status }
-          : task
+        task.id === event.active.id ? { ...task, status: newStatus } : task
       )
     );
+
+    fetch(`${API_URL}/tasks/${event.active.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus }),
+    });
   };
 
   const handleSubmitTask = async () => {
