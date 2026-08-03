@@ -25,11 +25,11 @@ function Sidebar() {
   const menuItems = [
     { label: "Board", icon: LayoutDashboard, path: "/board" },
     { label: "Analytics", icon: BarChart3, path: "/analytics" },
-    { label: "Notifications", icon: Settings, path: "/notifications" },
+    { label: "Notifications", icon: Bell, path: "/notifications" },
   ];
   const bottomItems = [
     { label: "Help", icon: HelpCircle, path: "/help" },
-    { label: "Settings", icon: Bell, path: "/settings" },
+    { label: "Settings", icon: Settings, path: "/settings" },
   ];
 
   useEffect(() => {
@@ -59,7 +59,7 @@ function Sidebar() {
       )}
 
       <div
-        className={`w-56 min-h-screen bg-surface-sidebar border-r border-surface-column p-4 flex flex-col fixed md:static top-0 left-0 z-40 transition-all duration-300 ease-in-out   
+        className={`w-56 h-screen overflow-y-auto bg-surface-sidebar border-r border-surface-column p-4 flex flex-col fixed md:static top-0 left-0 z-40 transition-all duration-300 ease-in-out   
           ${showCollapsed ? "md:w-20" : "md:w-56"}
           ${
             isSidebarOpen
