@@ -1,4 +1,9 @@
-package com.tempora;
+package com.tempora.db;
+
+import com.tempora.model.Priority;
+import com.tempora.model.Status;
+import com.tempora.model.StatusChange;
+import com.tempora.model.Task;
 
 import java.sql.*;
 import java.util.ArrayList;

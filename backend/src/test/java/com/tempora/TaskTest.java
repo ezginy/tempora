@@ -1,5 +1,8 @@
 package com.tempora;
 
+import com.tempora.model.Priority;
+import com.tempora.model.Status;
+import com.tempora.model.Task;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

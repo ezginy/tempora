@@ -1,4 +1,4 @@
-package com.tempora;
+package com.tempora.filter;
 
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpExchange;

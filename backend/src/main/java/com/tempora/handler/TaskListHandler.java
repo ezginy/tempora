@@ -1,8 +1,11 @@
-package com.tempora;
+package com.tempora.handler;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import com.tempora.db.TaskManager;
+import com.tempora.model.Status;
+import com.tempora.model.Task;
 
 import java.io.IOException;
 import java.io.InputStream;
