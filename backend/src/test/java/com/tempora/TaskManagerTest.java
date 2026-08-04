@@ -1,5 +1,9 @@
 package com.tempora;
 
+import com.tempora.db.TaskManager;
+import com.tempora.model.Priority;
+import com.tempora.model.Status;
+import com.tempora.model.Task;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

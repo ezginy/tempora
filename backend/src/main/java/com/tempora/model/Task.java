@@ -1,4 +1,4 @@
-package com.tempora;
+package com.tempora.model;
 
 import java.sql.Timestamp;
 

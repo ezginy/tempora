@@ -2,13 +2,18 @@ package com.tempora;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
+import com.tempora.db.DatabaseConnection;
+import com.tempora.db.TaskManager;
+import com.tempora.filter.CorsFilter;
+import com.tempora.handler.TaskDetailHandler;
+import com.tempora.handler.TaskListHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.sql.SQLException;
 
 public class Main {
-    
+
     public static void main(String[] args) throws IOException, SQLException {
         DatabaseConnection.runSchema();
 
