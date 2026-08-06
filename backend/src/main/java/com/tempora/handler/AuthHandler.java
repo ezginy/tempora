@@ -31,9 +31,12 @@ public class AuthHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String path = exchange.getRequestURI().getPath();
+        String method = exchange.getRequestMethod();
 
-        if (path.equals("/auth/register") && exchange.getRequestMethod().equals("POST")) {
+        if (path.equals("/auth/register") && method.equals("POST")) {
             handleRegister(exchange);
+        } else if (path.equals("/auth/login") && method.equals("POST")) {
+            handleLogin(exchange);
         } else {
             exchange.sendResponseHeaders(404, -1);
             exchange.close();
@@ -85,6 +88,36 @@ public class AuthHandler implements HttpHandler {
         }
     }
 
+    private void handleLogin(HttpExchange exchange) throws IOException {
+        InputStream is = exchange.getRequestBody();
+        String requestBody = new String(is.readAllBytes());
+
+        LoginRequest data = gson.fromJson(requestBody, LoginRequest.class);
+
+        try {
+            User user = userManager.findByEmail(data.email);
+
+            if (user == null || !PasswordUtil.verify(data.password, user.getPasswordHash())) {
+                sendError(exchange, 401, "Invalid email or password");
+                return;
+            }
+
+            String token = JwtUtil.generateToken(user.getId());
+            exchange.getResponseHeaders().add("Set-Cookie",
+                    "token=" + token + "; HttpOnly; Path=/; Max-Age=1296000");
+
+            String response = "{\"message\":\"Logged in successfully\"}";
+            exchange.getResponseHeaders().add("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+
+        } catch (SQLException e) {
+            sendError(exchange, 500, "Something went wrong while logging in");
+        }
+    }
+
     private void sendError(HttpExchange exchange, int statusCode, String message) throws IOException {
         String errorResponse = "{\"error\":\"" + message + "\"}";
         exchange.sendResponseHeaders(statusCode, errorResponse.getBytes().length);
@@ -98,5 +131,10 @@ public class AuthHandler implements HttpHandler {
         String password;
         String username;
         String displayName;
+    }
+
+    private static class LoginRequest {
+        String email;
+        String password;
     }
 }

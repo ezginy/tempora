@@ -30,7 +30,7 @@ public class Main {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
         // POST a new user (register)
-        var authContext = server.createContext("/auth/register", new AuthHandler(userManager, taskManager, gson));
+        var authContext = server.createContext("/auth/", new AuthHandler(userManager, taskManager, gson));
         authContext.getFilters().add(new CorsFilter());
 
         // GET all tasks, or POST a new task
