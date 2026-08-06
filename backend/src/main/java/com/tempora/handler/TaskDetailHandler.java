@@ -24,6 +24,7 @@ public class TaskDetailHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
+        int userId = (int) exchange.getAttribute("userId");
 
         // get the path, e.g. "/tasks/2", and split it to find the id
         String path = exchange.getRequestURI().getPath();
@@ -33,7 +34,7 @@ public class TaskDetailHandler implements HttpHandler {
         boolean isHistoryRequest = parts.length > 3 && parts[3].equals("history");
 
         try {
-            Task foundTask = taskManager.findById(id);
+            Task foundTask = taskManager.findById(id, userId);
 
             if (foundTask == null) {
                 String errorResponse = "{\"error\":\"Task not found\"}";
@@ -78,7 +79,7 @@ public class TaskDetailHandler implements HttpHandler {
                         foundTask.setStatus(taskUpdates.getStatus());
                     }
 
-                    taskManager.update(foundTask, oldStatus);
+                    taskManager.update(foundTask, oldStatus, userId);
 
                     String response = gson.toJson(foundTask);
                     exchange.sendResponseHeaders(200, response.getBytes().length);
@@ -88,7 +89,7 @@ public class TaskDetailHandler implements HttpHandler {
 
                 }
                 case "DELETE" -> {
-                    taskManager.deleteTask(id);
+                    taskManager.deleteTask(id, userId);
 
                     exchange.sendResponseHeaders(204, -1);
                     exchange.close();

@@ -11,6 +11,7 @@ public class Task {
     private Integer estimatedDuration;
     private int actualDuration;
     private Timestamp lastEnteredInProgressAt;
+    private Integer userId;
 
     // Original constructor, still used when duration info isn't relevant yet (defaults to null/0)
     public Task(int id, String title, String description, Priority priority, Status status) {
@@ -91,6 +92,14 @@ public class Task {
 
     public void setLastEnteredInProgressAt(Timestamp lastEnteredInProgressAt) {
         this.lastEnteredInProgressAt = lastEnteredInProgressAt;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     // Checks whether this task has the minimum required data (a non-blank title)

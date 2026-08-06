@@ -13,7 +13,7 @@ public class TaskManager {
 
     // Adds a new task to the database
     public void addTask(Task task) throws SQLException {
-        String sql = "INSERT INTO tasks (title, description, priority, status, estimated_duration) VALUES (?, ?, ?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO tasks (title, description, priority, status, estimated_duration, user_id) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -23,6 +23,7 @@ public class TaskManager {
             statement.setString(3, task.getPriority().toString());
             statement.setString(4, task.getStatus().toString());
             statement.setObject(5, task.getEstimatedDuration());
+            statement.setObject(6, task.getUserId());
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
@@ -34,19 +35,20 @@ public class TaskManager {
     }
 
     // Deletes the task with the given id
-    public void deleteTask(int id) throws SQLException {
-        String sql = "DELETE FROM tasks WHERE id = ?";
+    public void deleteTask(int id, int userId) throws SQLException {
+        String sql = "DELETE FROM tasks WHERE id = ? AND user_id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, id);
+            statement.setInt(2, userId);
             statement.executeUpdate();
         }
     }
 
     // Returns the full list of tasks
-    public List<Task> getAllTasks() throws SQLException {
+    public List<Task> getAllTasks(int userId) throws SQLException {
         List<Task> taskList = new ArrayList<>();
         String sql = """
                 SELECT tasks.*, latest_entry.changed_at AS last_entered_inprogress_at
@@ -58,24 +60,28 @@ public class TaskManager {
                     ORDER BY task_id, changed_at DESC
                 ) AS latest_entry
                 ON tasks.id = latest_entry.task_id
+                WHERE tasks.user_id = ?
                 """;
 
         try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet rs = statement.executeQuery()) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, userId);
 
-            while (rs.next()) {
-                Task task = new Task(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("description"),
-                        Priority.valueOf(rs.getString("priority")),
-                        Status.valueOf(rs.getString("status")),
-                        rs.getObject("estimated_duration", Integer.class),
-                        rs.getInt("actual_duration")
-                );
-                task.setLastEnteredInProgressAt(rs.getTimestamp("last_entered_inprogress_at"));
-                taskList.add(task);
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    Task task = new Task(
+                            rs.getInt("id"),
+                            rs.getString("title"),
+                            rs.getString("description"),
+                            Priority.valueOf(rs.getString("priority")),
+                            Status.valueOf(rs.getString("status")),
+                            rs.getObject("estimated_duration", Integer.class),
+                            rs.getInt("actual_duration")
+                    );
+                    task.setLastEnteredInProgressAt(rs.getTimestamp("last_entered_inprogress_at"));
+                    task.setUserId(rs.getInt("user_id"));
+                    taskList.add(task);
+                }
             }
         }
 
@@ -109,17 +115,18 @@ public class TaskManager {
     }
 
     // Finds a task by its id, or returns null if no match is found
-    public Task findById(int id) throws SQLException {
-        String sql = "SELECT * FROM tasks WHERE id = ?";
+    public Task findById(int id, int userId) throws SQLException {
+        String sql = "SELECT * FROM tasks WHERE id = ? AND user_id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, id);
+            statement.setInt(2, userId);
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
-                    return new Task(
+                    Task task = new Task(
                             rs.getInt("id"),
                             rs.getString("title"),
                             rs.getString("description"),
@@ -128,6 +135,8 @@ public class TaskManager {
                             rs.getObject("estimated_duration", Integer.class),
                             rs.getInt("actual_duration")
                     );
+                    task.setUserId(rs.getInt("user_id"));
+                    return task;
                 }
             }
         }
@@ -135,13 +144,13 @@ public class TaskManager {
     }
 
     // Updates an existing task in the database
-    public void update(Task task, Status oldStatus) throws SQLException {
+    public void update(Task task, Status oldStatus, int userId) throws SQLException {
         if (oldStatus == Status.IN_PROGRESS && task.getStatus() != Status.IN_PROGRESS) {
             int secondsSpent = calculateSecondsSinceLastEntry(task.getId());
             task.setActualDuration(task.getActualDuration() + secondsSpent);
         }
 
-        String sql = "UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, estimated_duration = ?, actual_duration = ? WHERE id = ?";
+        String sql = "UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, estimated_duration = ?, actual_duration = ? WHERE id = ? AND user_id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -153,6 +162,7 @@ public class TaskManager {
             statement.setObject(5, task.getEstimatedDuration());
             statement.setInt(6, task.getActualDuration());
             statement.setInt(7, task.getId());
+            statement.setInt(8, userId);
 
             statement.executeUpdate();
 
