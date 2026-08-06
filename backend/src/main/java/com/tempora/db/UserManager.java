@@ -10,8 +10,8 @@ import java.sql.SQLException;
 public class UserManager {
 
     // Adds a new user to the database, returns the generated id
-    public int addUser(String email, String passwordHash, String username, String displayName) throws SQLException {
-        String sql = "INSERT INTO users (email, password_hash, username, display_name) VALUES (?, ?, ?, ?) RETURNING id";
+    public int addUser(String email, String passwordHash, String username, String displayName, String avatar) throws SQLException {
+        String sql = "INSERT INTO users (email, password_hash, username, display_name, avatar) VALUES (?, ?, ?, ?, ?) RETURNING id";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -20,6 +20,7 @@ public class UserManager {
             statement.setString(2, passwordHash);
             statement.setString(3, username);
             statement.setString(4, displayName);
+            statement.setString(5, avatar);
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {

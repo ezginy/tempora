@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.Random;
 
 public class AuthHandler implements HttpHandler {
     private UserManager userManager;
@@ -56,9 +57,14 @@ public class AuthHandler implements HttpHandler {
                 return;
             }
 
+            String avatar = data.avatar;
+            if (avatar == null || !User.ALLOWED_AVATARS.contains(avatar)) {
+                avatar = User.ALLOWED_AVATARS.get(new Random().nextInt(User.ALLOWED_AVATARS.size()));
+            }
+
             // hash password and create the user
             String hashedPassword = PasswordUtil.hash(data.password);
-            int userId = userManager.addUser(data.email, hashedPassword, data.username, data.displayName);
+            int userId = userManager.addUser(data.email, hashedPassword, data.username, data.displayName, avatar);
 
             // create the welcome task
             Task welcomeTask = new Task(
@@ -76,7 +82,8 @@ public class AuthHandler implements HttpHandler {
             exchange.getResponseHeaders().add("Set-Cookie",
                     "token=" + token + "; HttpOnly; Path=/; Max-Age=1296000");
 
-            String response = "{\"message\":\"User registered successfully\"}";
+            UserResponse userResponse = new UserResponse(userId, data.email, data.username, data.displayName, avatar);
+            String response = gson.toJson(userResponse);
             exchange.getResponseHeaders().add("Content-Type", "application/json");
             exchange.sendResponseHeaders(201, response.getBytes().length);
             OutputStream os = exchange.getResponseBody();
@@ -131,10 +138,27 @@ public class AuthHandler implements HttpHandler {
         String password;
         String username;
         String displayName;
+        String avatar;
     }
 
     private static class LoginRequest {
         String email;
         String password;
+    }
+
+    private static class UserResponse {
+        int id;
+        String email;
+        String username;
+        String displayName;
+        String avatar;
+
+        UserResponse(int id, String email, String username, String displayName, String avatar) {
+            this.id = id;
+            this.email = email;
+            this.username = username;
+            this.displayName = displayName;
+            this.avatar = avatar;
+        }
     }
 }
