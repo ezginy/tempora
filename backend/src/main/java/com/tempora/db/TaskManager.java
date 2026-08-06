@@ -13,7 +13,7 @@ public class TaskManager {
 
     // Adds a new task to the database
     public void addTask(Task task) throws SQLException {
-        String sql = "INSERT INTO tasks (title, description, priority, status, estimated_duration) VALUES (?, ?, ?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO tasks (title, description, priority, status, estimated_duration, user_id) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -23,6 +23,7 @@ public class TaskManager {
             statement.setString(3, task.getPriority().toString());
             statement.setString(4, task.getStatus().toString());
             statement.setObject(5, task.getEstimatedDuration());
+            statement.setObject(6, task.getUserId());
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {

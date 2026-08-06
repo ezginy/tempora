@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 import com.tempora.db.DatabaseConnection;
 import com.tempora.db.TaskManager;
+import com.tempora.db.UserManager;
 import com.tempora.filter.CorsFilter;
+import com.tempora.handler.AuthHandler;
 import com.tempora.handler.TaskDetailHandler;
 import com.tempora.handler.TaskListHandler;
 
@@ -17,6 +19,7 @@ public class Main {
     public static void main(String[] args) throws IOException, SQLException {
         DatabaseConnection.runSchema();
 
+        UserManager userManager = new UserManager();
         TaskManager taskManager = new TaskManager();
         Gson gson = new Gson();
 
@@ -25,6 +28,10 @@ public class Main {
         int port = (portEnv != null) ? Integer.parseInt(portEnv) : 8080;
 
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+
+        // POST a new user (register)
+        var authContext = server.createContext("/auth/register", new AuthHandler(userManager, taskManager, gson));
+        authContext.getFilters().add(new CorsFilter());
 
         // GET all tasks, or POST a new task
         var tasksContext = server.createContext("/tasks", new TaskListHandler(taskManager, gson));
