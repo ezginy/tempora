@@ -30,6 +30,7 @@ public class CorsFilter extends Filter {
 
         exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
 
         // handle the browser's preflight check directly, don't pass it to the real handler
         if (exchange.getRequestMethod().equals("OPTIONS")) {
