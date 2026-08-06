@@ -24,11 +24,12 @@ public class TaskListHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
+        int userId = (int) exchange.getAttribute("userId");
 
         try {
             switch (method) {
                 case "GET" -> {
-                    String response = gson.toJson(taskManager.getAllTasks());
+                    String response = gson.toJson(taskManager.getAllTasks(userId));
                     exchange.sendResponseHeaders(200, response.getBytes().length);
                     OutputStream os = exchange.getResponseBody();
                     os.write(response.getBytes());
@@ -57,6 +58,7 @@ public class TaskListHandler implements HttpHandler {
                         newTask.setStatus(Status.TODO);
                     }
 
+                    newTask.setUserId(userId);
                     taskManager.addTask(newTask);
 
                     // respond with the created task as confirmation

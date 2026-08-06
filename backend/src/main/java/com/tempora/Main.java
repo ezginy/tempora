@@ -6,6 +6,7 @@ import com.tempora.db.DatabaseConnection;
 import com.tempora.db.TaskManager;
 import com.tempora.db.UserManager;
 import com.tempora.filter.CorsFilter;
+import com.tempora.filter.AuthFilter;
 import com.tempora.handler.AuthHandler;
 import com.tempora.handler.TaskDetailHandler;
 import com.tempora.handler.TaskListHandler;
@@ -36,10 +37,12 @@ public class Main {
         // GET all tasks, or POST a new task
         var tasksContext = server.createContext("/tasks", new TaskListHandler(taskManager, gson));
         tasksContext.getFilters().add(new CorsFilter());
+        tasksContext.getFilters().add(new AuthFilter());
 
         // GET a single task, or PUT to update it, or DELETE to remove it (path: /tasks/{id})
         var taskDetailContext = server.createContext("/tasks/", new TaskDetailHandler(taskManager, gson));
         taskDetailContext.getFilters().add(new CorsFilter());
+        taskDetailContext.getFilters().add(new AuthFilter());
 
         server.start();
 
