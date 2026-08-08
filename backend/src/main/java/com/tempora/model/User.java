@@ -1,6 +1,12 @@
 package com.tempora.model;
 
+import java.util.List;
+
 public class User {
+    public static final List<String> ALLOWED_AVATARS = List.of(
+            "red", "orange", "yellow", "green", "teal", "blue", "purple", "pink"
+    );
+    
     private int id;
     private String email;
     private String username;
