@@ -20,7 +20,9 @@ function Analytics() {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      const response = await fetch(`${API_URL}/tasks`);
+      const response = await fetch(`${API_URL}/tasks`, {
+        credentials: "include",
+      });
       const data = await response.json();
       setTasks(data.filter((t: Task) => t.status === "DONE"));
       setIsLoading(false);

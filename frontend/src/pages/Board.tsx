@@ -31,7 +31,9 @@ function Board() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch(`${API_URL}/tasks`);
+        const response = await fetch(`${API_URL}/tasks`, {
+          credentials: "include",
+        });
         const data = await response.json();
         setTasks(data);
       } catch (e) {
@@ -58,6 +60,7 @@ function Board() {
 
     fetch(`${API_URL}/tasks/${event.active.id}`, {
       method: "PUT",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus }),
     });
@@ -87,6 +90,7 @@ function Board() {
         // edit mod: PUT request
         const response = await fetch(`${API_URL}/tasks/${editingTaskId}`, {
           method: "PUT",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(taskData),
         });
@@ -103,6 +107,7 @@ function Board() {
         // create mod: POST request
         const response = await fetch(`${API_URL}/tasks`, {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(taskData),
         });
@@ -123,6 +128,7 @@ function Board() {
   const handleDeleteTask = async (id: number) => {
     await fetch(`${API_URL}/tasks/${id}`, {
       method: "DELETE",
+      credentials: "include",
     });
 
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
