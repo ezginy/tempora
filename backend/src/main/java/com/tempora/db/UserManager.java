@@ -54,4 +54,28 @@ public class UserManager {
         }
         return null;
     }
+
+    // Finds a user by id, or returns null if no match is found
+    public User findById(int id) throws SQLException {
+        String sql = "SELECT * FROM users WHERE id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                            rs.getInt("id"),
+                            rs.getString("email"),
+                            rs.getString("username"),
+                            rs.getString("display_name"),
+                            rs.getString("avatar"),
+                            rs.getString("password_hash")
+                    );
+                }
+            }
+        }
+        return null;
+    }
 }
