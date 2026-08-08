@@ -38,6 +38,8 @@ public class AuthHandler implements HttpHandler {
             handleRegister(exchange);
         } else if (path.equals("/auth/login") && method.equals("POST")) {
             handleLogin(exchange);
+        } else if (path.equals("/auth/me") && method.equals("GET")) {
+            handleMe(exchange);
         } else {
             exchange.sendResponseHeaders(404, -1);
             exchange.close();
@@ -122,6 +124,32 @@ public class AuthHandler implements HttpHandler {
 
         } catch (SQLException e) {
             sendError(exchange, 500, "Something went wrong while logging in");
+        }
+    }
+
+    private void handleMe(HttpExchange exchange) throws IOException {
+        int userId = (int) exchange.getAttribute("userId");
+
+        try {
+            User user = userManager.findById(userId);
+
+            if (user == null) {
+                sendError(exchange, 401, "Not authenticated");
+                return;
+            }
+
+            UserResponse userResponse = new UserResponse(
+                    user.getId(), user.getEmail(), user.getUsername(), user.getDisplayName(), user.getAvatar()
+            );
+            String response = gson.toJson(userResponse);
+            exchange.getResponseHeaders().add("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+            
+        } catch (SQLException e) {
+            sendError(exchange, 500, "Something went wrong");
         }
     }
 
