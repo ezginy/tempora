@@ -30,9 +30,15 @@ public class Main {
 
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
-        // POST a new user (register)
+        // POST a new user (register), or POST to log in
         var authContext = server.createContext("/auth/", new AuthHandler(userManager, taskManager, gson));
         authContext.getFilters().add(new CorsFilter());
+
+        // separate, more specific context so /auth/me gets its own auth check
+        // (HttpServer matches the most specific path, so this overrides /auth/)
+        var authMeContext = server.createContext("/auth/me", new AuthHandler(userManager, taskManager, gson));
+        authMeContext.getFilters().add(new CorsFilter());
+        authMeContext.getFilters().add(new AuthFilter());
 
         // GET all tasks, or POST a new task
         var tasksContext = server.createContext("/tasks", new TaskListHandler(taskManager, gson));
