@@ -8,7 +8,7 @@ export type User = {
   avatar: string;
 };
 
-type AuthContextType = {
+export type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
