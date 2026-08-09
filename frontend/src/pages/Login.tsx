@@ -29,14 +29,18 @@ function Login() {
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="p-2 rounded-md bg-surface-card-title text-text-primary w-full max-w-sm"
+        className={`p-2 rounded-md bg-surface-card-title text-text-primary w-full max-w-sm ${
+          error ? "border border-priority-high" : ""
+        }`}
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        className="p-2 rounded-md bg-surface-card-title text-text-primary w-full max-w-sm"
+        className={`p-2 rounded-md bg-surface-card-title text-text-primary w-full max-w-sm ${
+          error ? "border border-priority-high" : ""
+        }`}
       />
       {error && <p className="text-priority-high text-sm">{error}</p>}
 

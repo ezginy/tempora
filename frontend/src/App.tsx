@@ -24,7 +24,7 @@ function App() {
 
   return (
     <div className="flex bg-surface-page">
-      {!showSidebar && <Sidebar />}
+      {showSidebar && <Sidebar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
