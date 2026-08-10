@@ -45,8 +45,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data);
   };
 
+  const register = async (data: {
+    email: string;
+    password: string;
+    username: string;
+    displayName: string;
+    avatar: string;
+  }) => {
+    const response = await fetch(`${API_URL}/auth/register`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error("Registration failed");
+    }
+
+    const createdUser = await response.json();
+    setUser(createdUser);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register }}>
       {children}
     </AuthContext.Provider>
   );
