@@ -2,12 +2,11 @@ package com.tempora.filter;
 
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpExchange;
-import com.tempora.db.JwtUtil;
+import com.tempora.util.JwtUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 
 public class AuthFilter extends Filter {
 

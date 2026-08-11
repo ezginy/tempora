@@ -1,4 +1,4 @@
-package com.tempora.db;
+package com.tempora.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

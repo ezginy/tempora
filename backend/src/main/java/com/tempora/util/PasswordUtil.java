@@ -1,4 +1,4 @@
-package com.tempora.db;
+package com.tempora.util;
 
 import org.mindrot.jbcrypt.BCrypt;
 
