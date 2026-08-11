@@ -40,6 +40,8 @@ public class AuthHandler implements HttpHandler {
             handleLogin(exchange);
         } else if (path.equals("/auth/me") && method.equals("GET")) {
             handleMe(exchange);
+        } else if (path.equals("/auth/logout") && method.equals("POST")) {
+            handleLogout(exchange);
         } else {
             exchange.sendResponseHeaders(404, -1);
             exchange.close();
@@ -147,10 +149,22 @@ public class AuthHandler implements HttpHandler {
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());
             os.close();
-            
+
         } catch (SQLException e) {
             sendError(exchange, 500, "Something went wrong");
         }
+    }
+
+    private void handleLogout(HttpExchange exchange) throws IOException {
+        exchange.getResponseHeaders().add("Set-Cookie",
+                "token=; HttpOnly; Path=/; Max-Age=0");
+
+        String response = "{\"message\":\"Logged out successfully\"}";
+        exchange.getResponseHeaders().add("Content-Type", "application/json");
+        exchange.sendResponseHeaders(200, response.getBytes().length);
+        OutputStream os = exchange.getResponseBody();
+        os.write(response.getBytes());
+        os.close();
     }
 
     private void sendError(HttpExchange exchange, int statusCode, String message) throws IOException {
