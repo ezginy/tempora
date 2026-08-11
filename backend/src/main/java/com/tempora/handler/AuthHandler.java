@@ -136,7 +136,8 @@ public class AuthHandler implements HttpHandler {
             exchange.getResponseHeaders().add("Set-Cookie",
                     "token=" + token + "; HttpOnly; Path=/; Max-Age=1296000; SameSite=None; Secure");
 
-            String response = "{\"message\":\"Logged in successfully\"}";
+            UserResponse userResponse = new UserResponse(user.getId(), user.getEmail(), user.getUsername(), user.getDisplayName(), user.getAvatar());
+            String response = gson.toJson(userResponse);
             exchange.getResponseHeaders().add("Content-Type", "application/json");
             exchange.sendResponseHeaders(200, response.getBytes().length);
             OutputStream os = exchange.getResponseBody();
