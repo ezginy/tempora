@@ -63,7 +63,7 @@ function Sidebar() {
       )}
 
       <div
-        className={`w-56 h-dvh overflow-y-auto bg-surface-sidebar border-r border-surface-column p-4 flex flex-col fixed md:static top-0 left-0 z-40 transition-all duration-300 ease-in-out   
+        className={`w-56 h-dvh bg-surface-sidebar border-r border-surface-column p-4 flex flex-col fixed md:static top-0 left-0 z-40 transition-all duration-300 ease-in-out   
           ${showCollapsed ? "md:w-20" : "md:w-56"}
           ${
             isSidebarOpen
@@ -115,7 +115,7 @@ function Sidebar() {
           )}
         </div>
 
-        <nav className="flex flex-col">
+        <nav className="flex flex-col overflow-y-auto md:overflow-visible">
           {menuItems.map((item, index) => {
             const Icon = item.icon;
             return (
@@ -169,15 +169,22 @@ function Sidebar() {
           })}
 
           <div
-            className={`flex items-center gap-3 py-3 px-2 mx-2 rounded-md text-text-muted border-t border-surface-card mt-1 pt-4
+            className={`flex items-center gap-4 py-3 px-2 mx-2 rounded-md text-text-muted border-t border-surface-card mt-1 pt-4
             ${showCollapsed ? "justify-center" : ""}`}
           >
             <div
-              className={`w-6 h-6 rounded-full ${AVATAR_COLORS[user.avatar]} flex items-center justify-center shrink-0 text-xs font-bold text-text-primary`}
+              className={`w-7 h-7 rounded-full ${AVATAR_COLORS[user.avatar]} flex items-center justify-center shrink-0 text-xs font-bold text-text-primary`}
             >
               {user.displayName.charAt(0).toUpperCase()}
             </div>
-            {!showCollapsed && <span className="text-sm">{user.username}</span>}
+            {!showCollapsed && (
+              <div className="flex flex-col">
+                <h3 className="text-md font-semibold text-text-primary">
+                  {user.displayName}
+                </h3>
+                <span className="text-sm">@{user.username}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
