@@ -6,6 +6,7 @@ public class ValidationUtil {
     // compiled once as a constant instead of every call — cheaper and the industry-standard way to reuse a regex
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-z0-9._]{6,12}$");
     private static final Pattern EMAIL_SHAPE_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^\\S{8,28}$");
 
     public static boolean isValidDisplayName(String displayName) {
         // reject if the field wasn't sent at all
@@ -35,5 +36,13 @@ public class ValidationUtil {
         if (length < 6 || length > 55) return false;
 
         return EMAIL_SHAPE_PATTERN.matcher(email).matches();
+    }
+
+    public static boolean isValidPassword(String password) {
+        if (password == null) return false;
+
+        // no trim — a password with a leading/trailing space should be rejected,
+        // not silently cleaned up, same reasoning as isValidUsername
+        return PASSWORD_PATTERN.matcher(password).matches();
     }
 }

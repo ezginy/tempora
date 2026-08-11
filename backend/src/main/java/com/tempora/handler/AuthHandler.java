@@ -11,6 +11,7 @@ import com.tempora.model.Priority;
 import com.tempora.model.Status;
 import com.tempora.model.Task;
 import com.tempora.model.User;
+import com.tempora.util.ValidationUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,6 +54,24 @@ public class AuthHandler implements HttpHandler {
         String requestBody = new String(is.readAllBytes());
 
         RegisterRequest data = gson.fromJson(requestBody, RegisterRequest.class);
+
+        // validate fields before touching the database at all
+        if (!ValidationUtil.isValidDisplayName(data.displayName)) {
+            sendError(exchange, 400, "Display name must be 1-20 characters");
+            return;
+        }
+        if (!ValidationUtil.isValidUsername(data.username)) {
+            sendError(exchange, 400, "Username must be 6-12 characters: lowercase letters, digits, dot, or underscore only");
+            return;
+        }
+        if (!ValidationUtil.isValidEmail(data.email)) {
+            sendError(exchange, 400, "Please enter a valid email address");
+            return;
+        }
+        if (!ValidationUtil.isValidPassword(data.password)) {
+            sendError(exchange, 400, "Password must be 8-28 characters with no spaces");
+            return;
+        }
 
         try {
             // check if email is already taken
