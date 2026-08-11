@@ -67,8 +67,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(createdUser);
   };
 
+  const logout = async () => {
+    try {
+      await fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Logout failed");
+    } finally {
+      setUser(null);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 import {
   LayoutDashboard,
   BarChart3,
   Settings,
   Menu,
   PanelLeft,
-  User,
   Bell,
   HelpCircle,
 } from "lucide-react";
 import TemporaIcon from "./TemporaIcon";
+import { AVATAR_COLORS } from "../utils/avatarColors";
 
 function Sidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,6 +20,7 @@ function Sidebar() {
     return localStorage.getItem("sidebarCollapsed") === "true";
   });
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  const { user } = useAuth();
 
   const showCollapsed = isCollapsed && isDesktop;
 
@@ -41,6 +43,8 @@ function Sidebar() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  if (!user) return null;
 
   return (
     <>
@@ -168,10 +172,12 @@ function Sidebar() {
             className={`flex items-center gap-3 py-3 px-2 mx-2 rounded-md text-text-muted border-t border-surface-card mt-1 pt-4
             ${showCollapsed ? "justify-center" : ""}`}
           >
-            <div className="w-6 h-6 rounded-full bg-surface-column flex items-center justify-center shrink-0">
-              <User size={14} />
+            <div
+              className={`w-6 h-6 rounded-full ${AVATAR_COLORS[user.avatar]} flex items-center justify-center shrink-0 text-xs font-bold text-text-primary`}
+            >
+              {user.displayName.charAt(0).toUpperCase()}
             </div>
-            {!showCollapsed && <span className="text-sm">Account</span>}
+            {!showCollapsed && <span className="text-sm">{user.username}</span>}
           </div>
         </div>
       </div>

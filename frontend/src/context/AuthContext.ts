@@ -19,6 +19,7 @@ export type AuthContextType = {
     displayName: string;
     avatar: string;
   }) => Promise<void>;
+  logout: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
