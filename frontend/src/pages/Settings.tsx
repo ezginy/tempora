@@ -1,19 +1,44 @@
 import { useState, useEffect } from "react";
-import { Sun, Moon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
+import { Sun, Moon, LogOut } from "lucide-react";
 
 function Settings() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem("theme") !== "light";
   });
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.documentElement.classList.toggle("light", !isDarkMode);
     localStorage.setItem("theme", isDarkMode ? "dark" : "light");
   }, [isDarkMode]);
 
+  const handleLogout = async () => {
+    navigate("/");
+    await logout();
+  };
+
   return (
     <div className="p-4 md:p-8 mx-auto flex flex-col flex-1 h-screen md:max-w-3xl text-text-primary bg-surface-page">
       <h1 className="text-2xl font-bold mb-8 text-center">Settings</h1>
+
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold mb-3">Account</h2>
+        <div className="flex items-center justify-between p-4 rounded-lg bg-surface-card">
+          <div>
+            <p className="font-medium">Log out</p>
+            <p className="text-sm text-text-muted">Sign out of your account</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-surface-column text-priority-high/85"
+          >
+            <LogOut size={16} /> Log out
+          </button>
+        </div>
+      </section>
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">Appearance</h2>

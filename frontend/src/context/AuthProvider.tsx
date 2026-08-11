@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         credentials: "include",
       });
     } catch (err) {
-      console.error("Logout failed");
+      console.error("Logout failed: ", err);
     } finally {
       setUser(null);
     }
