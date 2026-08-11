@@ -13,17 +13,53 @@ function Register() {
     () => AVATAR_KEYS[Math.floor(Math.random() * AVATAR_KEYS.length)]
   );
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<{
+    displayName?: string;
+    username?: string;
+    email?: string;
+    password?: string;
+  }>({});
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  const validateForm = () => {
+    const newErrors: typeof errors = {};
+
+    if (!/^[a-z0-9._]{6,12}$/.test(username)) {
+      newErrors.username =
+        "6-12 characters, lowercase letters, digits, dot or underscore only";
+    }
+
+    if (displayName.trim().length < 1 || displayName.trim().length > 20) {
+      newErrors.displayName = "1-20 characters";
+    }
+
+    if (
+      !/^\S+@\S+\.\S+$/.test(email) ||
+      email.length < 6 ||
+      email.length > 55
+    ) {
+      newErrors.email = "Enter a valid email address";
+    }
+
+    if (password.length < 8 || password.length > 28 || /\s/.test(password)) {
+      newErrors.password = "8-28 characters, no spaces";
+    }
+
+    return newErrors;
+  };
+
   const handleRegister = async () => {
-    setError("");
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) return;
+
     try {
       await register({ email, password, username, displayName, avatar });
       navigate("/board");
     } catch (err) {
-      setError("Registration failed. Please check your details.");
+      setErrors({ email: "Registration failed. Please check your details." });
       console.error("Registration failed: ", err);
     }
   };
@@ -66,15 +102,22 @@ function Register() {
           )}
         </div>
 
-        <input
-          type="text"
-          placeholder="Display Name"
-          value={displayName}
-          onChange={(e) => setDisplayName(e.target.value)}
-          className={`p-2 rounded-md bg-surface-card-title text-text-primary flex-1 ${
-            error ? "border border-priority-high" : ""
-          }`}
-        />
+        <div className="flex flex-col w-full">
+          <input
+            type="text"
+            placeholder="Display Name"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            className={`p-2 rounded-md bg-surface-card-title text-text-primary flex-1 ${
+              errors.displayName ? "border border-priority-high" : ""
+            }`}
+          />
+          {errors.displayName && (
+            <p className="text-priority-high text-xs text-center mt-2">
+              {errors.displayName}
+            </p>
+          )}
+        </div>
       </div>
 
       <input
@@ -83,29 +126,36 @@ function Register() {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         className={`p-2 rounded-md bg-surface-card-title text-text-primary w-full max-w-sm ${
-          error ? "border border-priority-high" : ""
+          errors.username ? "border border-priority-high" : ""
         }`}
       />
+      {errors.username && (
+        <p className="text-priority-high text-xs -mt-2">{errors.username}</p>
+      )}
       <input
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         className={`p-2 rounded-md bg-surface-card-title text-text-primary w-full max-w-sm ${
-          error ? "border border-priority-high" : ""
+          errors.email ? "border border-priority-high" : ""
         }`}
       />
+      {errors.email && (
+        <p className="text-priority-high text-xs -mt-2">{errors.email}</p>
+      )}
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         className={`p-2 rounded-md bg-surface-card-title text-text-primary w-full max-w-sm ${
-          error ? "border border-priority-high" : ""
+          errors.password ? "border border-priority-high" : ""
         }`}
       />
-
-      {error && <p className="text-priority-high text-sm">{error}</p>}
+      {errors.password && (
+        <p className="text-priority-high text-xs -mt-2">{errors.password}</p>
+      )}
 
       <button
         onClick={handleRegister}
