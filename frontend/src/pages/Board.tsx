@@ -34,6 +34,8 @@ function Board() {
         const response = await fetch(`${API_URL}/tasks`, {
           credentials: "include",
         });
+        if (!response.ok)
+          throw new Error(`Failed to fetch tasks: ${response.status}`);
         const data = await response.json();
         setTasks(data);
       } catch (e) {
