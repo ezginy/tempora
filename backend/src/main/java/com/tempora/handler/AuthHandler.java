@@ -84,7 +84,7 @@ public class AuthHandler implements HttpHandler {
             // issue a token and set it as a cookie
             String token = JwtUtil.generateToken(userId);
             exchange.getResponseHeaders().add("Set-Cookie",
-                    "token=" + token + "; HttpOnly; Path=/; Max-Age=1296000");
+                    "token=" + token + "; HttpOnly; Path=/; Max-Age=1296000; SameSite=None; Secure");
 
             UserResponse userResponse = new UserResponse(userId, data.email, data.username, data.displayName, avatar);
             String response = gson.toJson(userResponse);
@@ -115,7 +115,7 @@ public class AuthHandler implements HttpHandler {
 
             String token = JwtUtil.generateToken(user.getId());
             exchange.getResponseHeaders().add("Set-Cookie",
-                    "token=" + token + "; HttpOnly; Path=/; Max-Age=1296000");
+                    "token=" + token + "; HttpOnly; Path=/; Max-Age=1296000; SameSite=None; Secure");
 
             String response = "{\"message\":\"Logged in successfully\"}";
             exchange.getResponseHeaders().add("Content-Type", "application/json");
@@ -157,7 +157,7 @@ public class AuthHandler implements HttpHandler {
 
     private void handleLogout(HttpExchange exchange) throws IOException {
         exchange.getResponseHeaders().add("Set-Cookie",
-                "token=; HttpOnly; Path=/; Max-Age=0");
+                "token=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure");
 
         String response = "{\"message\":\"Logged out successfully\"}";
         exchange.getResponseHeaders().add("Content-Type", "application/json");
