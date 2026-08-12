@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { Priority, Status, Task } from "../types/Task";
 import Column from "../components/Column";
+import { useAuth } from "../context/useAuth";
 import {
   DndContext,
   PointerSensor,
@@ -27,6 +28,8 @@ function Board() {
   const [newEstimatedDays, setNewEstimatedDays] = useState("");
   const [newEstimatedHours, setNewEstimatedHours] = useState("");
   const [newEstimatedMinutes, setNewEstimatedMinutes] = useState("");
+
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -155,6 +158,14 @@ function Board() {
     setEditingTaskId(null);
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Good morning";
+    if (hour >= 12 && hour < 18) return "Good afternoon";
+    if (hour >= 18 && hour < 22) return "Good evening";
+    return "Good night";
+  };
+
   const todoTasks = tasks.filter((task) => task.status === "TODO");
   const inProgressTasks = tasks.filter((task) => task.status === "IN_PROGRESS");
   const doneTasks = tasks.filter((task) => task.status === "DONE");
@@ -166,7 +177,9 @@ function Board() {
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="p-4 flex flex-col gap-6 text-text-primary bg-surface-page min-h-screen flex-1 overflow-x-hidden">
-        <h1 className="text-2xl font-bold -mb-4 text-center">Board</h1>
+        <h1 className="text-2xl font-semibold -mb-2 text-center">
+          {getGreeting()}, {user?.displayName}!
+        </h1>
 
         {isLoading && <p className="text-text-primary">Loading tasks...</p>}
         {error && <p className="text-priority-high">{error}</p>}

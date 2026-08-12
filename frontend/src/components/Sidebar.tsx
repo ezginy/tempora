@@ -124,9 +124,13 @@ function Sidebar() {
                 to={item.path}
                 onClick={() => setIsSidebarOpen(false)}
                 className={({ isActive }) =>
-                  `group relative flex items-center gap-3 py-3 px-2 mx-2 rounded-md ${
+                  `group relative flex items-center gap-3 py-3 px-2 mx-2 rounded-md transition-all duration-200 ${
                     index !== 0 ? "border-t border-surface-card" : ""
-                  } ${isActive ? "text-accent bg-accent-muted" : "text-text-muted"}`
+                  } ${
+                    isActive
+                      ? "text-accent bg-accent-muted"
+                      : "text-text-muted hover:bg-surface-column hover:translate-x-1"
+                  }`
                 }
               >
                 <Icon size={16} />
@@ -150,8 +154,10 @@ function Sidebar() {
                 to={item.path}
                 onClick={() => setIsSidebarOpen(false)}
                 className={({ isActive }) =>
-                  `group relative flex items-center gap-3 p-2 mx-2 rounded-md ${
-                    isActive ? "text-accent bg-accent-muted" : "text-text-muted"
+                  `group relative flex items-center gap-3 p-2 mx-2 rounded-md transition-all duration-200 ${
+                    isActive
+                      ? "text-accent bg-accent-muted"
+                      : "text-text-muted hover:bg-surface-column hover:translate-x-1"
                   }`
                 }
               >
