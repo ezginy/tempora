@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { getDefaultView } from "../utils/defaultView";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -13,7 +14,7 @@ function Login() {
     setError("");
     try {
       await login(email, password);
-      navigate("/board");
+      navigate(`/${getDefaultView()}`);
     } catch (err) {
       setError("Invalid email or password.");
       console.error("Login failed: ", err);

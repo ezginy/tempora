@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import TemporaIcon from "../components/TemporaIcon";
 import { useAuth } from "../context/useAuth";
 import { LayoutDashboard, Timer, BarChart3 } from "lucide-react";
+import { DEFAULT_VIEW_LABELS, getDefaultView } from "../utils/defaultView";
 
 function Home() {
   const { user, isLoading } = useAuth();
@@ -37,10 +38,10 @@ function Home() {
         <>
           {user ? (
             <Link
-              to="/board"
+              to={`/${getDefaultView()}`}
               className="mt-4 px-4 py-2 rounded-lg bg-accent text-surface-page font-semibold hover:opacity-80 transition-opacity"
             >
-              Go to Board
+              Go to {DEFAULT_VIEW_LABELS[getDefaultView()]}
             </Link>
           ) : (
             <div className="flex gap-3 mt-4">

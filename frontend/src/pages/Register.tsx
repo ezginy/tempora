@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { Pencil } from "lucide-react";
 import { AVATAR_COLORS, AVATAR_KEYS } from "../utils/avatarColors";
+import { getDefaultView } from "../utils/defaultView";
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -57,7 +58,7 @@ function Register() {
 
     try {
       await register({ email, password, username, displayName, avatar });
-      navigate("/board");
+      navigate(`/${getDefaultView()}`);
     } catch (err) {
       setErrors({ email: "Registration failed. Please check your details." });
       console.error("Registration failed: ", err);
