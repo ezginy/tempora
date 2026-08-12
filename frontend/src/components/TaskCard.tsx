@@ -77,80 +77,82 @@ function TaskCard(props: TaskCardProps) {
         opacity: isDragging ? 0.5 : 1,
         touchAction: "none",
       }}
-      className="p-4 rounded-xl border border-surface-sidebar bg-surface-card flex flex-col gap-3 w-full group hover:border-text-muted/30 transition-colors relative"
     >
-      <div className="flex justify-between items-start w-full">
-        <span
-          className={`w-fit px-2.5 py-1 uppercase text-[10px] font-bold tracking-wider rounded-full ${priorityStyles(props.task.priority)}`}
-        >
-          {props.task.priority}
-        </span>
-
-        <div className="relative">
-          <button
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-text-muted hover:text-text-primary p-1 rounded-md hover:bg-surface-sidebar transition-colors"
+      <div className="p-4 rounded-xl border border-surface-sidebar bg-surface-card flex flex-col gap-3 w-full group hover:border-text-muted/30 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 relative">
+        <div className="flex justify-between items-start w-full">
+          <span
+            className={`w-fit px-2.5 py-1 uppercase text-[10px] font-bold tracking-wider rounded-full ${priorityStyles(props.task.priority)}`}
           >
-            <MoreHorizontal size={16} />
-          </button>
+            {props.task.priority}
+          </span>
 
-          {isMenuOpen && (
-            <div
-              ref={menuRef}
-              className="absolute right-0 top-full mt-1 w-28 bg-surface-column border border-surface-sidebar rounded-md shadow-lg overflow-hidden z-10 flex flex-col"
+          <div className="relative">
+            <button
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-text-muted hover:text-text-primary p-1 rounded-md hover:bg-surface-sidebar transition-colors"
             >
-              <button
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  props.onEditTask(props.task);
-                }}
-                className="flex items-center gap-2 px-3 py-2 text-xs text-text-primary hover:bg-surface-sidebar text-left transition-colors"
+              <MoreHorizontal size={16} />
+            </button>
+
+            {isMenuOpen && (
+              <div
+                ref={menuRef}
+                className="absolute right-0 top-full mt-1 w-28 bg-surface-column border border-surface-sidebar rounded-md shadow-lg overflow-hidden z-10 flex flex-col"
               >
-                <Pencil size={14} /> Edit
-              </button>
-              <button
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  if (window.confirm(`Delete "${props.task.title}"?`)) {
-                    props.onDeleteTask(props.task.id);
-                  }
-                }}
-                className="flex items-center gap-2 px-3 py-2 text-xs text-priority-high hover:bg-priority-high/10 text-left transition-colors"
-              >
-                <Trash2 size={14} /> Delete
-              </button>
-            </div>
+                <button
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    props.onEditTask(props.task);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 text-xs text-text-primary hover:bg-surface-sidebar text-left transition-colors"
+                >
+                  <Pencil size={14} /> Edit
+                </button>
+                <button
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    if (window.confirm(`Delete "${props.task.title}"?`)) {
+                      props.onDeleteTask(props.task.id);
+                    }
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 text-xs text-priority-high hover:bg-priority-high/10 text-left transition-colors"
+                >
+                  <Trash2 size={14} /> Delete
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1 w-full text-left">
+          <h3 className="text-sm font-medium text-text-primary leading-snug">
+            {props.task.title}
+          </h3>
+          {props.task.description && (
+            <p className="text-xs text-text-muted line-clamp-2 leading-relaxed">
+              {props.task.description}
+            </p>
           )}
         </div>
-      </div>
 
-      <div className="flex flex-col gap-1 w-full text-left">
-        <h3 className="text-sm font-medium text-text-primary leading-snug">
-          {props.task.title}
-        </h3>
-        {props.task.description && (
-          <p className="text-xs text-text-muted line-clamp-2 leading-relaxed">
-            {props.task.description}
-          </p>
-        )}
-      </div>
-
-      <div className="w-full mt-1 flex justify-between items-center">
-        <span className="text-[10px] text-text-muted/40 font-mono font-medium">
-          #{props.task.id}
-        </span>
-        <span className="text-[12px] text-text-muted">
-          {props.task.status === "TODO" && props.task.estimatedDuration != null
-            ? `≈ ${formatDuration(props.task.estimatedDuration)}`
-            : props.task.status === "IN_PROGRESS"
-              ? `> ${formatDuration(elapsedSeconds)}`
-              : props.task.status === "DONE"
-                ? `: ${formatDuration(props.task.actualDuration)}`
-                : null}
-        </span>
+        <div className="w-full mt-1 flex justify-between items-center">
+          <span className="text-[10px] text-text-muted/40 font-mono font-medium">
+            #{props.task.id}
+          </span>
+          <span className="text-[12px] text-text-muted">
+            {props.task.status === "TODO" &&
+            props.task.estimatedDuration != null
+              ? `≈ ${formatDuration(props.task.estimatedDuration)}`
+              : props.task.status === "IN_PROGRESS"
+                ? `> ${formatDuration(elapsedSeconds)}`
+                : props.task.status === "DONE"
+                  ? `: ${formatDuration(props.task.actualDuration)}`
+                  : null}
+          </span>
+        </div>
       </div>
     </div>
   );
