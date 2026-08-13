@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS tasks
     created_at         TIMESTAMPTZ                                                   DEFAULT now()  NOT NULL,
     estimated_duration INTEGER,
     actual_duration    INTEGER                                                       DEFAULT 0      NOT NULL,
-    user_id            INTEGER REFERENCES users (id) ON DELETE CASCADE
+    user_id            INTEGER REFERENCES users (id) ON DELETE CASCADE                              NOT NULL
 );
 
 ALTER TABLE tasks
@@ -28,6 +28,8 @@ ALTER TABLE tasks
     ADD COLUMN IF NOT EXISTS actual_duration INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE tasks
     ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users (id) ON DELETE CASCADE;
+ALTER TABLE tasks
+    ALTER COLUMN user_id SET NOT NULL;
 
 CREATE TABLE IF NOT EXISTS status_history
 (
