@@ -6,7 +6,7 @@ A full-stack Kanban board that goes beyond task tracking by measuring how long e
 
 > The backend runs on Render's free tier and sleeps after 15 minutes of inactivity — the first request can take up to 50 seconds to wake it up. Your data is safe though; it's stored in a managed Postgres database, not on the server itself.
 
-**Status:** v1 almost complete — full CRUD, drag & drop, persistent storage, time-in-column analytics, and CI/CD all live.
+**Status:** v1 almost done — auth, all pages, and analytics are working. A few loose ends left (see Roadmap) before I call it finished.
 
 ---
 
@@ -18,14 +18,17 @@ A full-stack Kanban board that goes beyond task tracking by measuring how long e
 
 ## ✨ What works right now
 
+- User accounts — register, login, logout, JWT stored in an `httpOnly` cookie. Each user only sees their own board.
 - Full CRUD REST API with input validation and JUnit 5 tests
 - Persistent storage — tasks are saved in PostgreSQL (Neon) and survive server restarts
-- Board with three columns (`TODO` / `IN_PROGRESS` / `DONE`), drag & drop between them (dnd-kit), synced to the backend with a `PUT` request
+- Board with three columns (`TODO` / `IN_PROGRESS` / `DONE`), drag & drop between them (dnd-kit, touch-friendly), synced to the backend with a `PUT` request
 - Create and edit tasks through a modal, with title validation; delete with a confirmation step
 - Task priorities (`LOW` / `MEDIUM` / `HIGH`) with color-coded badges
 - **Time-in-column analytics** — set an estimated duration on a task, watch a live counter while it's `IN_PROGRESS`, and see the actual time frozen once it's `DONE`. An analytics page compares estimated vs. actual time per task and highlights the ones that ran over or finished early.
 - Full status-change history stored per task (`GET /tasks/{id}/history`) — the backend logs every transition, so time can't be hidden by moving a task back and forth
-- Collapsible sidebar navigation, dark/light mode, responsive layout with touch-friendly drag & drop
+- A notifications page listing tasks that went over their estimated time, whether still in progress or already done
+- Collapsible sidebar navigation (persisted, with hover tooltips), dark/light mode, responsive layout
+- A settings page — appearance, board preferences, and account
 - Loading and error states throughout
 - CI on every pull request, and automatic deploys on merge
 
@@ -33,7 +36,7 @@ A full-stack Kanban board that goes beyond task tracking by measuring how long e
 
 ## 🛠 Tech
 
-**Backend:** Java 17, Maven, JDK built-in `HttpServer`, Gson, JUnit 5, PostgreSQL with raw JDBC (no ORM).
+**Backend:** Java 17, Maven, JDK built-in `HttpServer`, Gson, JUnit 5, PostgreSQL with raw JDBC (no ORM), JWT (`jjwt`) + BCrypt (`jbcrypt`) for auth.
 
 **Frontend:** React, TypeScript, Vite, Tailwind CSS v4, react-router-dom, dnd-kit, Recharts, lucide-react.
 
@@ -43,9 +46,15 @@ A full-stack Kanban board that goes beyond task tracking by measuring how long e
 
 ## 🔌 API
 
+All `/tasks*` endpoints require a valid auth cookie.
+
 | Method   | Path                  | Behavior                                                                      |
 | :------- | :-------------------- | :---------------------------------------------------------------------------- |
-| `GET`    | `/tasks`              | All tasks, including duration fields (200)                                    |
+| `POST`   | `/auth/register`      | Creates a user, hashes the password, sets the auth cookie (201)               |
+| `POST`   | `/auth/login`         | Verifies credentials, sets the auth cookie (200)                              |
+| `GET`    | `/auth/me`            | Returns the current user if the cookie is valid (200) or 401                  |
+| `POST`   | `/auth/logout`        | Clears the auth cookie (200)                                                  |
+| `GET`    | `/tasks`              | The current user's tasks, including duration fields (200)                     |
 | `POST`   | `/tasks`              | Create a task (201), empty title -> 400, status defaults to `TODO`            |
 | `GET`    | `/tasks/{id}`         | One task (200) or 404                                                         |
 | `PUT`    | `/tasks/{id}`         | Partial update - only the sent fields are changed (200) or 404                |
@@ -65,7 +74,7 @@ cd backend
 mvn compile exec:java
 ```
 
-The backend reads its database connection from environment variables (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`), so nothing sensitive is committed. The schema is created automatically on startup — no manual SQL setup needed.
+Requires `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, and `JWT_SECRET` as environment variables. The schema is created automatically on startup.
 
 Frontend (needs Node.js):
 
@@ -97,25 +106,32 @@ Both need to run at the same time. Tests: `mvn test` in the backend folder.
 
 ## 🧠 Some decisions I made
 
-- **No framework on purpose.** My browser blocked my own frontend and that's how I actually learned what CORS is - I wrote a whitelist filter for it instead of allowing `*`.
-- **`PUT` does partial updates.** Drag & drop only needs to change `status`, so sending the whole object felt wrong. Only the fields you send get updated. I later learned this behavior is actually closer to what `PATCH` is for - noted for a future refactor.
-- **PostgreSQL over SQLite.** SQLite was my first plan — simpler, no server to run. But since the backend is deployed on Render's free tier, where the filesystem isn't persistent, a SQLite file would be wiped on every restart. So I went with PostgreSQL from the start of the persistence work. The SQL I wanted to learn is the same either way.
-- **Raw JDBC, no ORM.** I wanted to write the SQL myself and understand what's happening, instead of letting a tool like Hibernate hide it.
-- **Separate dev and prod databases.** Local development uses my own Postgres; production uses a managed database (Neon), so test data I add locally never mixes with what's live.
-- **`VARCHAR + CHECK` instead of native enums** for priority and status, so adding a new value later (like `ARCHIVED`) is easier than altering a native enum type.
-- **The server never trusts the client for durations.** The frontend only ever sends a status change — the backend calculates and stores actual time spent. Otherwise someone could just send a fake duration through Postman.
-- **A schema drift bug taught me to think about migrations.** When I added the duration columns, `CREATE TABLE IF NOT EXISTS` silently did nothing on production, since the table already existed — the new columns never got created there, and the API started failing with 500s. Now every new column gets both the `CREATE TABLE` definition and a matching `ALTER TABLE ... ADD COLUMN IF NOT EXISTS`, so existing databases stay in sync too.
-- **Docker for the backend.** Render doesn't support plain Java, so I wrote a Dockerfile to build and run it - not something I planned, just what deploying actually required.
-- **One modal for create and edit.** The forms were identical, so a single `editingTaskId` state decides whether submitting sends a `POST` or a `PUT`.
+- **No framework, on purpose.** My browser blocked my own frontend once, and that's actually how I learned what CORS is. Wrote a whitelist filter for it instead of just allowing `*`.
+- **`PUT` only updates what you send.** Drag & drop just changes `status`, so sending the whole task object every time felt dumb.
+- **PostgreSQL instead of SQLite.** SQLite was the original plan, simpler, no server needed. But Render's free tier wipes the filesystem on restart, so the SQLite file would've been gone every time. Switched to PostgreSQL before I even wrote the SQLite code.
+- **Raw JDBC, no ORM.** Wanted to actually write the SQL instead of Hibernate doing it for me.
+- **JWT instead of sessions.** No framework = no built-in session store, so a token made more sense than building that myself.
+- **JWT lives in an httpOnly cookie, not localStorage.** Can't be read by JS on the frontend, which is safer. Cost me a real bug though - needed `SameSite=None; Secure` for the cookie to survive Vercel talking to Render (different domains), took me a while to figure out why login worked but every request after it returned 401.
+- **Backend calculates durations, not the frontend.** Frontend just sends a status change. If the frontend calculated the time, anyone could fake it with Postman.
+- **Learned about migrations the hard way.** Added new columns, forgot `CREATE TABLE IF NOT EXISTS` does nothing if the table already exists. Production broke. Now I add both the column in `CREATE TABLE` and a separate `ALTER TABLE ... ADD COLUMN IF NOT EXISTS`.
+- **Docker for the backend.** Render doesn't run plain Java, so this wasn't really optional.
 
 ---
 
 ## 🗺️ Roadmap
 
-- A task history view in the UI (the `/history` endpoint already exists, just not wired up to a screen yet)
-- A proper testing strategy for the database layer (the manager tests became integration tests once persistence was added, and are currently disabled)
-- Splitting backend classes into subpackages (`model`, `handler`, `db`, `filter`) as the codebase grows
-- Authentication and multi-user boards (right now the board is shared — everyone sees the same tasks)
+**Loose ends before v1 is really done:**
+
+- `tasks.user_id` should be `NOT NULL` now that every task belongs to a user - not migrated yet
+- The "confirm before delete" setting exists in Settings but isn't wired up to the actual delete flow yet
+- A task history view in the UI (the `/history` endpoint already exists, just not shown on a screen yet)
+
+**After that:**
+
+- A proper testing strategy for the database layer and for input validation (currently only tested manually / disabled)
+- Splitting off a dedicated analytics/reporting endpoint
+- Forgot-password flow
+- Team features (multiple users on one board, roles, invites)
 - Spring Boot version of the backend, to compare against this one
 
 ---
