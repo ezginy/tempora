@@ -177,7 +177,7 @@ function Board() {
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="p-4 flex flex-col gap-6 text-text-primary bg-surface-page min-h-screen flex-1 overflow-x-hidden">
-        <h1 className="text-2xl font-semibold -mb-2 text-center">
+        <h1 className="text-2xl font-semibold -mb-2 text-center md:text-left">
           {getGreeting()}, {user?.displayName}!
         </h1>
 

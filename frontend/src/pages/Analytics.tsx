@@ -55,7 +55,9 @@ function Analytics() {
 
   return (
     <div className="p-4 text-text-primary bg-surface-page flex flex-col flex-1 h-screen">
-      <h1 className="text-2xl font-bold mb-8 text-center">Analytics</h1>
+      <h1 className="text-2xl font-bold mb-8 text-center md:text-left">
+        Analytics
+      </h1>
       <h2 className="text-lg font-semibold mb-3">
         Estimated vs Actual Duration
       </h2>
