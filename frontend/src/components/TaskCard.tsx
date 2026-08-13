@@ -4,6 +4,7 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Priority, Task } from "../types/Task";
 import { Trash2, Pencil, MoreHorizontal } from "lucide-react";
 import { formatDuration } from "../utils/formatDuration";
+import { getElapsedSeconds } from "../utils/getElapsedSeconds";
 
 type TaskCardProps = {
   task: Task;
@@ -38,11 +39,8 @@ function TaskCard(props: TaskCardProps) {
       return;
     }
 
-    const startTime = new Date(props.task.lastEnteredInProgressAt).getTime();
-
     const updateElapsed = () => {
-      const now = Date.now();
-      setElapsedSeconds(Math.floor((now - startTime) / 1000));
+      setElapsedSeconds(getElapsedSeconds(props.task.lastEnteredInProgressAt!));
     };
 
     updateElapsed();

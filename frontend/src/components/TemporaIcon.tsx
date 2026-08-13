@@ -1,9 +1,13 @@
 // Icon for Tempora
-function TemporaIcon() {
+type TemporaIconProps = {
+  size?: number;
+};
+
+function TemporaIcon({ size = 28 }: TemporaIconProps) {
   return (
     <svg
-      width="28"
-      height="28"
+      width={size}
+      height={size}
       viewBox="0 0 28 28"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
