@@ -81,8 +81,8 @@ function Analytics() {
     .sort((a, b) => Math.abs(b.diffSeconds) - Math.abs(a.diffSeconds));
 
   return (
-    <div className="p-4 text-text-primary bg-surface-page flex flex-col flex-1 h-screen">
-      <h1 className="text-2xl font-bold mb-8 text-center md:text-left">
+    <div className="p-4 text-text-primary bg-surface-page flex flex-col flex-1 h-screen overflow-y-auto">
+      <h1 className="text-2xl font-bold mb-8 self-end md:self-start pr-6 pb-2 border-r border-b border-surface-column rounded-br-3xl">
         Analytics
       </h1>
       <h2 className="text-lg font-semibold mb-3">
@@ -131,7 +131,7 @@ function Analytics() {
       </ResponsiveContainer>
 
       <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
+        <div className="md:pr-8 md:border-r md:border-surface-column">
           <h2 className="text-lg font-semibold mb-3">
             Tasks that ran over estimate
           </h2>
@@ -165,7 +165,17 @@ function Analytics() {
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold mb-3">Task History</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold mb-3">Task History</h2>
+            {selectedTaskId !== null && (
+              <button
+                onClick={() => setSelectedTaskId(null)}
+                className="flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors"
+              >
+                <ChevronLeft size={16} /> Back to tasks
+              </button>
+            )}
+          </div>
 
           {selectedTaskId === null ? (
             <ul className="flex flex-col gap-2">
@@ -183,13 +193,6 @@ function Analytics() {
             </ul>
           ) : (
             <div className="flex flex-col gap-4">
-              <button
-                onClick={() => setSelectedTaskId(null)}
-                className="flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors"
-              >
-                <ChevronLeft size={16} /> Back to tasks
-              </button>
-
               {isHistoryLoading ? (
                 <p className="text-text-muted text-sm">Loading...</p>
               ) : (

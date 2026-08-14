@@ -38,8 +38,24 @@ body {
   --color-text-muted: #6b6b73;
 }
 
-
 .recharts-wrapper:focus,
 .recharts-surface:focus {
   outline: none;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-surface-column) var(--color-surface-page);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface-page);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-column);
+  border-radius: 9999px;
 }

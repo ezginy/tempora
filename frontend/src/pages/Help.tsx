@@ -39,8 +39,8 @@ function Help() {
     },
   ];
   return (
-    <div className="p-4 text-text-primary bg-surface-page flex flex-col items-center flex-1 h-screen">
-      <h1 className="text-2xl font-bold">Help</h1>
+    <div className="p-4 text-text-primary bg-surface-page flex flex-col items-center flex-1 h-screen overflow-y-auto">
+      <h1 className="text-2xl my-4 font-bold">Help</h1>
       <div className="mt-8 flex flex-col gap-5 max-w-2xl text-center">
         {helpItems.map((item) => (
           <div key={item.title} className="p-4 rounded-2xl bg-surface-card">

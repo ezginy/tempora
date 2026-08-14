@@ -26,7 +26,7 @@ function Home() {
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center flex-1 h-screen gap-4 text-center px-4">
+    <div className="flex flex-col items-center justify-center flex-1 h-screen gap-4 text-center px-4 overflow-y-auto">
       <TemporaIcon size={48} />
       <h1 className="text-3xl font-bold text-text-primary">Tempora</h1>
       <p className="text-text-muted max-w-sm p-2">

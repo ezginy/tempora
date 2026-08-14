@@ -22,7 +22,7 @@ function Login() {
   };
 
   return (
-    <div className="p-4 gap-4 text-text-primary bg-surface-page flex flex-col justify-center items-center flex-1 min-h-screen">
+    <div className="p-4 gap-4 text-text-primary bg-surface-page flex flex-col justify-center items-center flex-1 h-screen overflow-y-auto">
       <h1 className="text-2xl font-bold">Log in</h1>
 
       <input
