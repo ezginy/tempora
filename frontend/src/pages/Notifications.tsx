@@ -45,8 +45,8 @@ function Notifications() {
   });
 
   return (
-    <div className="p-4 text-text-primary bg-surface-page flex flex-col flex-1 h-screen">
-      <h1 className="text-2xl font-bold text-center md:text-left">
+    <div className="p-4 text-text-primary bg-surface-page flex flex-col flex-1 h-screen overflow-y-auto">
+      <h1 className="text-2xl font-bold self-end md:self-start pr-6 pb-2 border-r border-b border-surface-column rounded-br-3xl">
         Notifications
       </h1>
       <div className="mt-4 flex flex-col gap-3 w-full">

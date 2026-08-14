@@ -176,23 +176,24 @@ function Board() {
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="p-4 flex flex-col gap-6 text-text-primary bg-surface-page min-h-screen flex-1 overflow-x-hidden">
-        <h1 className="text-2xl font-semibold -mb-2 text-center md:text-left">
-          {getGreeting()}, {user?.displayName}!
-        </h1>
+      <div className="p-4 flex flex-col gap-6 text-text-primary bg-surface-page h-screen flex-1 overflow-x-hidden overflow-y-auto">
+        <div className="flex flex-col items-end gap-3 md:flex-row md:items-center md:justify-between md:gap-0">
+          <h1 className="text-2xl font-semibold self-end md:self-start pr-6 pb-2 border-r border-b border-surface-column rounded-br-3xl">
+            {getGreeting()}, {user?.displayName}!
+          </h1>
+          <button
+            onClick={() => {
+              setIsModalOpen(true);
+              resetForm();
+            }}
+            className="px-3 py-1.5 rounded-lg bg-accent text-surface-page font-semibold hover:opacity-80 transition-opacity"
+          >
+            + Add Task
+          </button>
+        </div>
 
         {isLoading && <p className="text-text-primary">Loading tasks...</p>}
         {error && <p className="text-priority-high">{error}</p>}
-
-        <button
-          onClick={() => {
-            setIsModalOpen(true);
-            resetForm();
-          }}
-          className="px-3 py-1.5 rounded-lg bg-accent text-surface-page font-semibold hover:opacity-80 transition-opacity self-end"
-        >
-          + Add Task
-        </button>
 
         <div className="flex flex-col md:flex-row gap-8 w-full md:justify-center">
           <Column

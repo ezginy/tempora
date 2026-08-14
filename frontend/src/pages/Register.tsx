@@ -66,7 +66,7 @@ function Register() {
   };
 
   return (
-    <div className="p-4 gap-4 text-text-primary bg-surface-page flex flex-col justify-center items-center w-full min-h-screen">
+    <div className="p-4 gap-4 text-text-primary bg-surface-page flex flex-col justify-center items-center w-full h-screen overflow-y-auto">
       <h1 className="text-2xl font-bold">Register</h1>
 
       <div className="flex items-center gap-3 w-full max-w-sm">

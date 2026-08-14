@@ -38,8 +38,8 @@ function Settings() {
   };
 
   return (
-    <div className="p-4 md:p-8 mx-auto flex flex-col flex-1 h-screen overflow-y-auto md:max-w-3xl text-text-primary bg-surface-page">
-      <h1 className="text-2xl font-bold mb-8 text-center">Settings</h1>
+    <div className="p-4 mx-auto flex flex-col flex-1 h-screen overflow-y-auto md:max-w-3xl text-text-primary bg-surface-page">
+      <h1 className="text-2xl font-bold mb-8 mt-4 text-center">Settings</h1>
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">Account</h2>
